@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="健康監測">
+  <title>健康監測 V13.9.1</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">❤</div>
+      <div><div class="brand-title">健康監測</div><div class="brand-sub">V13.9.1 Stability Fix</div></div>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-page="dashboard">🏠 <span>健康總覽</span></button>
+      <button class="nav-btn" data-page="trends">📈 <span>趨勢分析</span></button>
+      <button class="nav-btn" data-page="alerts">🚦 <span>異常提醒</span></button>
+      <button class="nav-btn" data-page="lifestyle">🥗 <span>飲食・運動・作息</span></button>
+      <button class="nav-btn" data-page="daily">✅ <span>每日紀錄</span></button>
+      <button class="nav-btn" data-page="weekly">🎯 <span>本週目標</span></button>
+      <button class="nav-btn" data-page="score">🏅 <span>健康行動評分</span></button>
+      <button class="nav-btn" data-page="correlation">🔗 <span>檢驗×生活關聯</span></button>
+      <button class="nav-btn" data-page="report">🧾 <span>健康報告</span></button>
+      <button class="nav-btn" data-page="wearable">⌚ <span>小米手環 7</span></button>
+      <button class="nav-btn" data-page="labs">📋 <span>全部檢驗</span></button>
+      <button class="nav-btn" data-page="add">➕ <span>新增檢驗</span></button>
+      <button class="nav-btn" data-page="settings">⚙️ <span>資料連線</span></button>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn">☰</button>
+      <div>
+        <h1 id="pageTitle">健康總覽</h1>
+        <p id="pageSub">依長期趨勢安排下一步，而不是只看單次紅字</p>
+      </div>
+      <div class="sync-wrap">
+        <span id="syncStatus" class="sync-pill">本機資料</span>
+        <button id="refreshBtn" class="small-btn">重新整理</button>
+      </div>
+    </header>
+
+    <section class="page active" id="dashboard">
+      <div class="grid metrics" id="metricGrid"></div>
+      <div class="grid two">
+        <article class="card"><h2>目前優先事項</h2><div id="priorityList"></div></article>
+        <article class="card"><h2>最近一次變化</h2><div id="changeList"></div></article>
+      </div>
+      <div class="grid two">
+        <article class="card">
+          <h2>血糖趨勢</h2>
+          <div class="chart-wrap"><canvas id="chartGlucose"></canvas></div>
+        </article>
+        <article class="card">
+          <h2>腎功能趨勢</h2>
+          <div class="chart-wrap"><canvas id="chartKidney"></canvas></div>
+        </article>
+      </div>
+      <article class="card">
+        <h2>本月生活目標</h2>
+        <div class="goal-grid" id="goalGrid"></div>
+      </article>
+    </section>
+
+    <section class="page" id="trends">
+      <div class="grid two">
+        <article class="card"><h2>空腹血糖</h2><div class="chart-wrap"><canvas id="trendGlucose"></canvas></div><div id="trendGlucoseText"></div></article>
+        <article class="card"><h2>HbA1c</h2><div class="chart-wrap"><canvas id="trendA1c"></canvas></div><div id="trendA1cText"></div></article>
+      </div>
+      <div class="grid two">
+        <article class="card"><h2>Creatinine</h2><div class="chart-wrap"><canvas id="trendCr"></canvas></div><div id="trendCrText"></div></article>
+        <article class="card"><h2>eGFR</h2><div class="chart-wrap"><canvas id="trendEgfr"></canvas></div><div id="trendEgfrText"></div></article>
+      </div>
+      <div class="grid two">
+        <article class="card"><h2>尿酸</h2><div class="chart-wrap"><canvas id="trendUric"></canvas></div><div id="trendUricText"></div></article>
+        <article class="card"><h2>體重</h2><div class="chart-wrap"><canvas id="trendWeight"></canvas></div><div id="trendWeightText"></div></article>
+      </div>
+    </section>
+
+    <section class="page" id="alerts">
+      <article class="card">
+        <h2>紅黃綠燈健康提醒</h2>
+        <div id="alertCards" class="alert-grid"></div>
+      </article>
+      <article class="card">
+        <h2>需要醫師進一步評估的訊號</h2>
+        <div id="doctorFlags" class="advice-list"></div>
+        <p class="small">此頁是健康管理提醒，不取代診斷。單次異常值需結合複檢、症狀與醫師判斷。</p>
+      </article>
+    </section>
+
+    <section class="page" id="lifestyle">
+      <div class="grid two">
+        <article class="card"><h2>依目前數值的飲食建議</h2><div id="dietAdvice"></div></article>
+        <article class="card"><h2>依目前狀況的運動建議</h2><div id="exerciseAdvice"></div></article>
+      </div>
+      <div class="grid two">
+        <article class="card"><h2>生活作息</h2><div id="sleepAdvice"></div></article>
+        <article class="card notice"><h2>目前執行重點</h2><div id="actionAdvice"></div></article>
+      </div>
+    </section>
+
+    <section class="page" id="daily">
+      <div class="grid two">
+        <article class="card">
+          <h2>今日紀錄</h2>
+          <div class="form-grid">
+            <label>日期<input id="dDate" type="date"></label>
+            <label>體重 kg<input id="dWeight" type="number" step="0.1" inputmode="decimal"></label>
+            <label>步行/有氧 分鐘<input id="dExercise" type="number" step="1" inputmode="numeric"></label>
+            <label>飯後走路 分鐘<input id="dPostMeal" type="number" step="1" inputmode="numeric"></label>
+            <label>睡眠 小時<input id="dSleep" type="number" step="0.1" inputmode="decimal"></label>
+            <label>飲水 mL<input id="dWater" type="number" step="100" inputmode="numeric"></label>
+          </div>
+          <div class="check-grid">
+            <label><input id="dSugary" type="checkbox"> 今天有喝含糖飲</label>
+            <label><input id="dVeg" type="checkbox"> 兩餐以上有足量蔬菜</label>
+            <label><input id="dLate" type="checkbox"> 晚餐過晚或睡前大量進食</label>
+          </div>
+          <div class="form-actions"><button id="saveDailyBtn" class="primary-btn">儲存今日紀錄</button></div>
+          <p id="dailyMsg" class="small"></p><p class="small">已連接 Google Sheet 時，每日紀錄也會跨裝置同步；未連線時則先存本機。</p>
+        </article>
+        <article class="card">
+          <h2>最近 7 天完成度</h2>
+          <div id="weeklyScore"></div>
+        </article>
+      </div>
+      <article class="card">
+        <h2>最近生活紀錄</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>日期</th><th>體重</th><th>有氧</th><th>飯後走</th><th>睡眠</th><th>含糖飲</th></tr></thead>
+          <tbody id="dailyTableBody"></tbody>
+        </table></div>
+      </article>
+    </section>
+
+    <section class="page" id="weekly">
+      <article class="card">
+        <h2>本週自動目標</h2>
+        <div id="weeklyGoals" class="goal-grid"></div>
+      </article>
+      <div class="grid two">
+        <article class="card"><h2>本週執行率</h2><div id="weeklyProgress"></div></article>
+        <article class="card"><h2>下週調整方向</h2><div id="nextWeekAdvice"></div></article>
+      </div>
+    </section>
+
+
+    <section class="page" id="score">
+      <div class="grid two">
+        <article class="card score-hero">
+          <h2>本週健康行動分數</h2>
+          <div id="healthScore" class="score-ring-wrap"></div>
+          <p class="small">這是生活執行分數，不是疾病風險分數，也不是醫療診斷。</p>
+        </article>
+        <article class="card">
+          <h2>本週優先改善</h2>
+          <div id="scorePriorities" class="advice-list"></div>
+        </article>
+      </div>
+
+      <article class="card">
+        <h2>五大行動構面</h2>
+        <div id="scoreBreakdown" class="score-grid"></div>
+      </article>
+
+      <div class="grid two">
+        <article class="card">
+          <h2>4 週趨勢</h2>
+          <div class="chart-wrap"><canvas id="scoreTrend"></canvas></div>
+          <div id="scoreTrendText"></div>
+        </article>
+        <article class="card">
+          <h2>下一週建議</h2>
+          <div id="nextWeekPlan" class="advice-list"></div>
+        </article>
+      </div>
+    </section>
+
+
+    <section class="page" id="correlation">
+      <article class="card">
+        <h2>檢驗 × 生活習慣關聯</h2>
+        <p class="small">這裡比較「某次抽血前一段時間的生活紀錄」與下一次檢驗變化，只顯示關聯，不把它當成因果證明。</p>
+        <div id="correlationSummary" class="alert-grid"></div>
+      </article>
+
+      <div class="grid two">
+        <article class="card">
+          <h2>HbA1c 前 90 天生活</h2>
+          <div class="chart-wrap"><canvas id="corrA1cChart"></canvas></div>
+          <div id="corrA1cText"></div>
+        </article>
+        <article class="card">
+          <h2>空腹血糖前 30 天生活</h2>
+          <div class="chart-wrap"><canvas id="corrGlucoseChart"></canvas></div>
+          <div id="corrGlucoseText"></div>
+        </article>
+      </div>
+
+      <div class="grid two">
+        <article class="card">
+          <h2>體重與血糖變化</h2>
+          <div class="chart-wrap"><canvas id="corrWeightChart"></canvas></div>
+          <div id="corrWeightText"></div>
+        </article>
+        <article class="card">
+          <h2>腎功能前 30 天生活</h2>
+          <div class="chart-wrap"><canvas id="corrKidneyChart"></canvas></div>
+          <div id="corrKidneyText"></div>
+        </article>
+      </div>
+
+      <article class="card">
+        <h2>每次檢驗前的生活摘要</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>檢驗日</th><th>前期紀錄天數</th><th>平均體重</th><th>平均有氧</th>
+                <th>飯後走達標率</th><th>無糖飲率</th><th>睡眠達標率</th>
+              </tr>
+            </thead>
+            <tbody id="preLabLifestyleBody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card notice">
+        <h2>如何解讀</h2>
+        <div class="advice-list">
+          <div class="advice-item">HbA1c 約反映前 2–3 個月平均血糖，因此本頁優先使用抽血前 90 天的生活紀錄。</div>
+          <div class="advice-item">空腹血糖、體重與 BUN/Creatinine 受近期狀態影響較多，因此本頁另外看抽血前約 30 天。</div>
+          <div class="advice-item">資料量太少時，系統會直接顯示「資料不足」，不會硬算結論。</div>
+        </div>
+      </article>
+    </section>
+
+
+    <section class="page" id="report">
+      <article class="card report-toolbar">
+        <div>
+          <h2>本次健康報告</h2>
+          <p class="small">自動比較最近一次與前一次檢驗，整理改善、持平與需追蹤項目。</p>
+        </div>
+        <div class="form-actions report-actions">
+          <button id="printReportBtn" class="primary-btn">列印 / 儲存 PDF</button>
+          <button id="copyReportBtn" class="secondary-btn">複製文字摘要</button>
+        </div>
+      </article>
+
+      <div id="reportRoot">
+        <article class="card">
+          <div class="report-head">
+            <div>
+              <h2>健康追蹤摘要</h2>
+              <p id="reportDate" class="small"></p>
+            </div>
+            <div id="reportOverall" class="report-overall"></div>
+          </div>
+          <div id="reportHighlights" class="alert-grid"></div>
+        </article>
+
+        <div class="grid two">
+          <article class="card">
+            <h2>改善項目</h2>
+            <div id="reportImproved" class="advice-list"></div>
+          </article>
+          <article class="card">
+            <h2>需持續追蹤</h2>
+            <div id="reportWatch" class="advice-list"></div>
+          </article>
+        </div>
+
+        <div class="grid two">
+          <article class="card">
+            <h2>目前穩定</h2>
+            <div id="reportStable" class="advice-list"></div>
+          </article>
+          <article class="card">
+            <h2>接下來 4–12 週</h2>
+            <div id="reportPlan" class="advice-list"></div>
+          </article>
+        </div>
+
+        <article class="card">
+          <h2>最近一次檢驗總表</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>項目</th><th>最新</th><th>前次</th><th>變化</th><th>系統提醒</th></tr></thead>
+              <tbody id="reportLabTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+
+    
+    <section class="page" id="wearable">
+      <article class="card">
+        <div class="report-head">
+          <div>
+            <h2>Xiaomi Smart Band 7</h2>
+            <p class="small">資料路徑：小米手環 7 → Zepp Life → Apple Health → iPhone 捷徑 → Google Sheet → 本系統。</p>
+          </div>
+          <div id="wearableSyncBadge" class="report-overall">尚未同步</div>
+        </div>
+        <div class="grid metrics" id="wearableMetrics"></div>
+      </article>
+
+      <div class="grid two">
+        <article class="card">
+          <h2>最近 14 天活動</h2>
+          <div class="chart-wrap"><canvas id="wearableStepsChart"></canvas></div>
+          <div class="chart-wrap"><canvas id="wearableCaloriesChart"></canvas></div>
+        </article>
+        <article class="card">
+          <h2>最近 14 天睡眠</h2>
+          <div class="chart-wrap"><canvas id="wearableSleepChart"></canvas></div>
+          <div id="sleepSummary"></div>
+        </article>
+      </div>
+
+      <div class="grid two">
+        <article class="card">
+          <h2>最近 14 天心率 / 血氧</h2>
+          <div class="chart-wrap"><canvas id="wearableHrChart"></canvas></div>
+          <div class="chart-wrap"><canvas id="wearableSpo2Chart"></canvas></div>
+        </article>
+        <article class="card">
+          <h2>手環資料 × 健康目標</h2>
+          <div id="bandHealthLink" class="advice-list"></div>
+        </article>
+      </div>
+
+      
+      <article class="card">
+        <h2>Zepp Life 串接檢查</h2>
+        <div class="advice-list">
+          <div class="advice-item"><b>1.</b> 小米手環 7 維持綁定 Zepp Life，不需要改綁 Mi Fitness。</div>
+          <div class="advice-item"><b>2.</b> iPhone「健康」App 內確認 Zepp Life 已出現在資料來源 / App 清單。</div>
+          <div class="advice-item"><b>3.</b> 先確認 Apple Health 裡實際看得到「步數、睡眠」等資料。</div>
+          <div class="advice-item"><b>4.</b> Apple Health 沒有的項目就不要同步到本系統，也不要自行估算。</div>
+          <div class="advice-item"><b>5.</b> 等 Apple Health 有資料後，再用 iPhone 捷徑 POST 到 Apps Script。</div>
+        </div>
+      </article>
+
+<article class="card">
+        <h2>今日 Smart Band 7 資料</h2>
+        <div class="form-grid">
+          <label>日期<input id="wDate" type="date"></label>
+          <label>步數<input id="wSteps" type="number" inputmode="numeric"></label>
+          <label>距離 km<input id="wDistance" type="number" step="0.01" inputmode="decimal"></label>
+          <label>活動熱量 kcal<input id="wCalories" type="number" step="1" inputmode="numeric"></label>
+          <label>運動分鐘<input id="wExerciseMinutes" type="number" step="1" inputmode="numeric"></label>
+          <label>平均心率 bpm<input id="wAvgHr" type="number" step="1" inputmode="numeric"></label>
+          <label>靜息心率 bpm<input id="wRestHr" type="number" step="1" inputmode="numeric"></label>
+          <label>平均血氧 %<input id="wSpo2" type="number" step="0.1" inputmode="decimal"></label>
+          <label>睡眠總時數<input id="wSleep" type="number" step="0.1" inputmode="decimal"></label>
+          <label>深睡時數<input id="wDeepSleep" type="number" step="0.1" inputmode="decimal"></label>
+          <label>REM 時數<input id="wRemSleep" type="number" step="0.1" inputmode="decimal"></label>
+          <label>夜間最低血氧 %<input id="wMinSpo2" type="number" step="0.1" inputmode="decimal"></label>
+        </div>
+        <div class="form-actions">
+          <button id="saveWearableBtn" class="primary-btn">測試上傳</button>
+          <button id="refreshWearableBtn" class="secondary-btn">重新讀取</button>
+        </div>
+        <p id="wearableMsg" class="small"></p>
+      </article>
+
+      <article class="card">
+        <h2>自動同步建議</h2>
+        <div class="goal-grid">
+          <div><b>早上</b><span>優先同步昨晚睡眠；心率、血氧等只有在 Apple Health 實際有資料時才同步。</span></div>
+          <div><b>晚上</b><span>優先同步全天步數、距離與活動量；其他欄位依 Apple Health 實際資料決定。</span></div>
+          <div><b>保留原始值</b><span>Google Sheet 每天只更新同一日期，不重複新增。</span></div>
+          <div><b>醫療限制</b><span>心率與血氧主要用於長期趨勢，不取代醫療級檢查。</span></div>
+        </div>
+      </article>
+    </section>
+
+<section class="page" id="labs">
+      <article class="card"><h2>檢驗紀錄</h2><div class="table-wrap"><table>
+        <thead><tr><th>日期</th><th>項目</th><th>結果</th><th>單位</th></tr></thead>
+        <tbody id="labTableBody"></tbody>
+      </table></div></article>
+    </section>
+
+    
+    <section class="page" id="add">
+      <article class="card">
+        <h2>新增完整檢驗</h2>
+        <p class="small">只填這次有驗的項目即可，留白不會當成 0。</p>
+
+        <h3 class="section-title">基本與代謝</h3>
+        <div class="form-grid">
+          <label>日期<input id="fDate" type="date"></label>
+          <label>體重 kg<input id="fWeight" type="number" step="0.1" inputmode="decimal"></label>
+          <label>收縮壓 mmHg<input id="fSBP" type="number" step="1" inputmode="numeric"></label>
+          <label>舒張壓 mmHg<input id="fDBP" type="number" step="1" inputmode="numeric"></label>
+          <label>空腹血糖 mg/dL<input id="fGlucose" type="number" step="0.1" inputmode="decimal"></label>
+          <label>HbA1c %<input id="fA1c" type="number" step="0.1" inputmode="decimal"></label>
+        </div>
+
+        <h3 class="section-title">腎功能與尿酸</h3>
+        <div class="form-grid">
+          <label>Creatinine mg/dL<input id="fCr" type="number" step="0.01" inputmode="decimal"></label>
+          <label>BUN mg/dL<input id="fBun" type="number" step="0.1" inputmode="decimal"></label>
+          <label>eGFR<input id="fEgfr" type="number" step="0.1" inputmode="decimal"></label>
+          <label>尿酸 mg/dL<input id="fUric" type="number" step="0.1" inputmode="decimal"></label>
+          <label>uACR mg/g<input id="fUacr" type="number" step="0.1" inputmode="decimal"></label>
+          <label>尿蛋白
+            <select id="fUrineProtein">
+              <option value="">未檢驗</option><option value="negative">陰性</option><option value="trace">微量</option>
+              <option value="1+">1+</option><option value="2+">2+</option><option value="3+">3+</option>
+            </select>
+          </label>
+          <label>尿潛血
+            <select id="fUrineBlood">
+              <option value="">未檢驗</option><option value="negative">陰性</option><option value="trace">微量</option>
+              <option value="1+">1+</option><option value="2+">2+</option><option value="3+">3+</option>
+            </select>
+          </label>
+        </div>
+
+        <h3 class="section-title">血脂</h3>
+        <div class="form-grid">
+          <label>總膽固醇 TC<input id="fTC" type="number" step="0.1" inputmode="decimal"></label>
+          <label>LDL-C<input id="fLDL" type="number" step="0.1" inputmode="decimal"></label>
+          <label>HDL-C<input id="fHDL" type="number" step="0.1" inputmode="decimal"></label>
+          <label>三酸甘油脂 TG<input id="fTG" type="number" step="0.1" inputmode="decimal"></label>
+        </div>
+
+        <h3 class="section-title">肝功能與電解質</h3>
+        <div class="form-grid">
+          <label>AST U/L<input id="fAST" type="number" step="0.1" inputmode="decimal"></label>
+          <label>ALT U/L<input id="fAlt" type="number" step="0.1" inputmode="decimal"></label>
+          <label>γ-GT U/L<input id="fGGT" type="number" step="0.1" inputmode="decimal"></label>
+          <label>Na mmol/L<input id="fNa" type="number" step="0.1" inputmode="decimal"></label>
+          <label>K mmol/L<input id="fK" type="number" step="0.1" inputmode="decimal"></label>
+        </div>
+
+        <h3 class="section-title">血球與凝血</h3>
+        <div class="form-grid">
+          <label>Hb g/dL<input id="fHb" type="number" step="0.1" inputmode="decimal"></label>
+          <label>Hct %<input id="fHct" type="number" step="0.1" inputmode="decimal"></label>
+          <label>RBC<input id="fRBC" type="number" step="0.01" inputmode="decimal"></label>
+          <label>WBC<input id="fWBC" type="number" step="0.01" inputmode="decimal"></label>
+          <label>PLT<input id="fPLT" type="number" step="1" inputmode="numeric"></label>
+          <label>MCV fL<input id="fMCV" type="number" step="0.1" inputmode="decimal"></label>
+          <label>MCH pg<input id="fMCH" type="number" step="0.1" inputmode="decimal"></label>
+          <label>MCHC g/dL<input id="fMCHC" type="number" step="0.1" inputmode="decimal"></label>
+          <label>PT sec<input id="fPT" type="number" step="0.1" inputmode="decimal"></label>
+          <label>INR<input id="fINR" type="number" step="0.01" inputmode="decimal"></label>
+          <label>PTT sec<input id="fPTT" type="number" step="0.1" inputmode="decimal"></label>
+        </div>
+
+        <div class="form-actions">
+          <button id="saveLabBtn" class="primary-btn">儲存本次檢驗</button>
+          <button id="clearLabBtn" class="secondary-btn">清空欄位</button>
+        </div>
+        <p id="saveMsg" class="small"></p>
+      </article>
+    </section>
+
+<section class="page" id="settings">
+      <article class="card">
+        <h2>Google Sheet / Apps Script 連線</h2>
+        <p>把 Apps Script Web App 的 <b>/exec</b> 網址貼在下面。未設定時系統使用本機資料。</p>
+        <label class="full-label">Apps Script URL<input id="apiUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec"></label>
+        <div class="form-actions">
+          <button id="saveApiBtn" class="primary-btn">儲存網址</button>
+          <button id="testApiBtn" class="secondary-btn">測試連線</button>
+        </div>
+        <p id="apiMsg" class="small"></p>
+      </article>
+      <article class="card">
+        <h2>目前個人基準</h2>
+        <div class="lab-pair"><span>身高</span><b>174 cm</b></div>
+        <div class="lab-pair"><span>目前體重</span><b id="settingsWeight">88 kg</b></div>
+        <div class="lab-pair"><span>系統方向</span><b>血糖、體重、腎功能、尿酸長期管理</b></div>
+      </article>
+    </section>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

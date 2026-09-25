@@ -1,0 +1,24 @@
+V13.9.1 Stability QA
+
+Static checks:
+- Duplicate HTML IDs: none
+- Navigation count: 13
+- Page count: 13
+- Navigation/pages match: True
+- Missing static DOM IDs referenced by JS: none
+- Legacy standalone loadData() startup calls remaining: 0
+- Legacy standalone loadDataV133() startup calls remaining: 0
+- Unified startup present: True
+- Zepp Life source present: True
+- Wearable API route present: True
+- Apps Script version: V13.9.1
+
+Issue fixed:
+- Previous cumulative versions could trigger multiple startup data loads (lab/daily/wearable), creating redundant requests and possible render races.
+- V13.9.1 disables legacy startup calls and uses one final unified startup after all overrides are registered.
+
+Not executable in this local QA:
+- Live Google Apps Script authorization/deployment
+- Real Zepp Life → Apple Health data availability
+- iOS Shortcut automation
+These require the user's real Google/iPhone environment.
