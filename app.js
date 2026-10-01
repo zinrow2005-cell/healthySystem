@@ -6,7 +6,7 @@ const SAMPLE_DATA = [
   {date:"2026-09-21", fasting_glucose:122, hba1c:5.6, creatinine:1.27, bun:25, egfr:72.79, uric_acid:3.2, alt:27, sodium:141, potassium:4.6, hb:14.3, hct:44.1, rbc:5.11, wbc:6.12, plt:278, mcv:86.3, mch:28.0, mchc:32.4, pt:9.8, inr:0.91, ptt:30.0, weight:88}
 ];
 const HEIGHT_M=1.74;
-let records=[], dailyLogs=[];
+let records=[];
 const $=s=>document.querySelector(s);
 const n=v=>v===null||v===undefined||v===""?null:Number(v);
 const fmt=(v,d=1)=>v===null||v===undefined||Number.isNaN(Number(v))?"—":Number(v).toFixed(d).replace(/\.0$/,"");
@@ -15,8 +15,6 @@ const titles={
   trends:["趨勢分析","把血糖、腎功能、尿酸與體重分開看"],
   alerts:["異常提醒","紅黃綠燈＋需要提早回診的訊號"],
   lifestyle:["飲食・運動・作息","依目前數值自動調整建議"],
-  daily:["每日紀錄","把執行狀況與檢驗趨勢連在一起"],
-  weekly:["本週目標","每週重新計算可執行目標"],
   labs:["全部檢驗","查看歷次檢驗資料"],
   add:["新增檢驗","新增後自動更新趨勢與建議"],
   settings:["資料連線","Google Sheet + Apps Script"]
@@ -92,7 +90,7 @@ function render(){
 
   drawLine($("#chartGlucose"),values("fasting_glucose"),labels("fasting_glucose"));
   drawLine($("#chartKidney"),values("creatinine"),labels("creatinine"));
-  renderTrends(); renderAlerts(); renderLifestyle(); renderLabs(); renderDaily(); renderWeekly();
+  renderTrends(); renderAlerts(); renderLifestyle(); renderLabs();
   $("#settingsWeight").textContent=fmt(w,1)+" kg";
 }
 function renderTrends(){
@@ -176,44 +174,9 @@ function renderLabs(){
   sorted().slice().reverse().forEach(r=>Object.entries(fields).forEach(([k,v])=>{if(n(r[k])!==null)rows.push(`<tr><td>${r.date}</td><td>${v[0]}</td><td>${fmt(n(r[k]),2)}</td><td>${v[1]}</td></tr>`)}));
   $("#labTableBody").innerHTML=rows.join("");
 }
-function saveDaily(){
-  const d={date:$("#dDate").value,weight:n($("#dWeight").value),exercise:n($("#dExercise").value)||0,postmeal:n($("#dPostMeal").value)||0,sleep:n($("#dSleep").value),water:n($("#dWater").value),sugary:$("#dSugary").checked,veg:$("#dVeg").checked,late:$("#dLate").checked};
-  if(!d.date){$("#dailyMsg").textContent="請先選日期。";return}
-  dailyLogs=dailyLogs.filter(x=>x.date!==d.date);dailyLogs.push(d);dailyLogs.sort((a,b)=>a.date.localeCompare(b.date));
-  localStorage.setItem("healthDailyLogs",JSON.stringify(dailyLogs));$("#dailyMsg").textContent="已儲存今日紀錄。";renderDaily();renderWeekly();
-}
-function renderDaily(){
-  dailyLogs=JSON.parse(localStorage.getItem("healthDailyLogs")||"[]");
-  const last=[...dailyLogs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,7);
-  $("#dailyTableBody").innerHTML=last.map(d=>`<tr><td>${d.date}</td><td>${fmt(d.weight,1)}</td><td>${d.exercise||0} 分</td><td>${d.postmeal||0} 分</td><td>${fmt(d.sleep,1)} 小時</td><td>${d.sugary?"有":"無"}</td></tr>`).join("")||`<tr><td colspan="6">尚無每日紀錄</td></tr>`;
-  if(!last.length){$("#weeklyScore").innerHTML="<p>開始記錄後，這裡會顯示最近 7 天完成度。</p>";return}
-  let score=0,max=0;
-  last.forEach(d=>{max+=4;if((d.exercise||0)>=20)score++;if((d.postmeal||0)>=10)score++;if(n(d.sleep)>=7)score++;if(!d.sugary)score++;});
-  const pct=Math.round(score/max*100);
-  $("#weeklyScore").innerHTML=`<div class="score-big">${pct}%</div><div class="progress"><span style="width:${pct}%"></span></div><p class="muted">依有氧、飯後走路、睡眠與含糖飲四項計算。</p>`;
-}
-function renderWeekly(){
-  const last=[...dailyLogs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,7), l=latest(), w=n(l.weight)||88;
-  const totalEx=last.reduce((s,d)=>s+(d.exercise||0),0), postDays=last.filter(d=>(d.postmeal||0)>=10).length, noSugar=last.filter(d=>!d.sugary).length, sleepDays=last.filter(d=>n(d.sleep)>=7).length;
-  $("#weeklyGoals").innerHTML=`
-    <div><b>有氧</b><span>本週累積 150 分鐘以上。</span></div>
-    <div><b>飯後走</b><span>至少 5 天，每天 ≥10 分鐘。</span></div>
-    <div><b>含糖飲</b><span>至少 6 天不喝含糖飲。</span></div>
-    <div><b>睡眠</b><span>至少 5 天達到 7 小時以上。</span></div>`;
-  const exPct=Math.min(100,Math.round(totalEx/150*100)),postPct=Math.min(100,Math.round(postDays/5*100)),sugPct=Math.min(100,Math.round(noSugar/6*100)),slPct=Math.min(100,Math.round(sleepDays/5*100));
-  $("#weeklyProgress").innerHTML=`
-    <p>有氧 ${totalEx}/150 分鐘</p><div class="progress"><span style="width:${exPct}%"></span></div>
-    <p>飯後走 ${postDays}/5 天</p><div class="progress"><span style="width:${postPct}%"></span></div>
-    <p>無含糖飲 ${noSugar}/6 天</p><div class="progress"><span style="width:${sugPct}%"></span></div>
-    <p>睡眠達標 ${sleepDays}/5 天</p><div class="progress"><span style="width:${slPct}%"></span></div>`;
-  const advice=[];
-  if(exPct<70) advice.push("下週先增加快走頻率，不必一次延長很多時間。");
-  if(postPct<70) advice.push("把『飯後走 10 分鐘』綁定午餐或晚餐，會比靠意志力更容易執行。");
-  if(sugPct<80) advice.push("含糖飲仍是最值得優先改善的項目，先改無糖茶或水。");
-  if(slPct<70) advice.push("睡眠不足會影響食慾與血糖，優先固定上床時間。");
-  if(!advice.length) advice.push("目前執行率不錯，下週維持相同節奏即可，不需要突然加量。");
-  $("#nextWeekAdvice").innerHTML=`<div class="advice-list">${advice.map(x=>`<div class="advice-item">${x}</div>`).join("")}</div>`;
-}
+
+
+
 async function loadData(){
   dailyLogs=JSON.parse(localStorage.getItem("healthDailyLogs")||"[]");
   const api=localStorage.getItem("healthApiUrl")||"";$("#apiUrl").value=api;
@@ -290,63 +253,18 @@ async function loadDataV133(){
   const api=localStorage.getItem("healthApiUrl")||"";
   $("#apiUrl").value=api;
   const localLabs=JSON.parse(localStorage.getItem("healthLocalData")||JSON.stringify(SAMPLE_DATA));
-  const localDaily=JSON.parse(localStorage.getItem("healthDailyLogs")||"[]");
-  if(!api){
-    records=localLabs;
-    dailyLogs=localDaily;
-    syncMode="local";
-    $("#syncStatus").textContent="本機資料";
-    render();
-    return;
-  }
+  if(!api){records=localLabs;syncMode="local";$("#syncStatus").textContent="本機資料";render();return;}
   try{
     $("#syncStatus").textContent="同步中…";
-    const [labData,dailyData]=await Promise.all([apiGet("list"),apiGet("daily_list")]);
+    const labData=await apiGet("list");
     records=Array.isArray(labData.records)?labData.records:localLabs;
-    dailyLogs=mergeDaily(localDaily, Array.isArray(dailyData.records)?dailyData.records:[]);
-    localStorage.setItem("healthDailyLogs",JSON.stringify(dailyLogs));
-    syncMode="cloud";
-    $("#syncStatus").textContent="Google Sheet 全資料已同步";
-    render();
+    syncMode="cloud";$("#syncStatus").textContent="Google Sheet 已同步";render();
   }catch(e){
-    records=localLabs;
-    dailyLogs=localDaily;
-    syncMode="fallback";
-    $("#syncStatus").textContent="同步失敗・本機資料";
-    render();
+    records=localLabs;syncMode="fallback";$("#syncStatus").textContent="同步失敗・本機資料";render();
   }
 }
-async function saveDailyV133(){
-  const d={date:$("#dDate").value,weight:n($("#dWeight").value),exercise:n($("#dExercise").value)||0,postmeal:n($("#dPostMeal").value)||0,sleep:n($("#dSleep").value),water:n($("#dWater").value),sugary:$("#dSugary").checked,veg:$("#dVeg").checked,late:$("#dLate").checked};
-  if(!d.date){$("#dailyMsg").textContent="請先選日期。";return}
-  dailyLogs=dailyLogs.filter(x=>x.date!==d.date);dailyLogs.push(d);dailyLogs.sort((a,b)=>a.date.localeCompare(b.date));
-  localStorage.setItem("healthDailyLogs",JSON.stringify(dailyLogs));
-  const api=localStorage.getItem("healthApiUrl")||"";
-  if(api){
-    try{
-      await apiPost({action:"daily_upsert",record:d});
-      $("#dailyMsg").textContent="已同步到 Google Sheet，其他裝置也會看到這筆紀錄。";
-      syncMode="cloud";
-    }catch(e){
-      $("#dailyMsg").textContent="雲端同步失敗，但已先存本機。";
-    }
-  }else{
-    $("#dailyMsg").textContent="已儲存在此裝置；設定 Apps Script 後可跨裝置同步。";
-  }
-  renderDaily();renderWeekly();
-}
-async function syncLocalDailyToCloud(){
-  const api=localStorage.getItem("healthApiUrl")||"";
-  if(!api){$("#apiMsg").textContent="請先設定 Apps Script /exec 網址。";return}
-  const local=JSON.parse(localStorage.getItem("healthDailyLogs")||"[]");
-  try{
-    for(const row of local){ await apiPost({action:"daily_upsert",record:row}); }
-    $("#apiMsg").textContent=`已將 ${local.length} 筆本機每日紀錄同步到 Google Sheet。`;
-    await loadDataV133();
-  }catch(e){
-    $("#apiMsg").textContent="同步失敗："+e.message;
-  }
-}
+
+
 function addSyncButton(){
   const settings = $("#settings .card");
   if(settings && !$("#syncDailyBtn")){
@@ -391,106 +309,13 @@ $("#saveApiBtn").addEventListener("click",()=>{
 /* ===== V13.4 Goals & Scoring ===== */
 titles.score=["健康行動評分","把每天可控制的行為，轉成清楚的每週進度"];
 
-function lastNDaysLogs(nDays=28){
-  const cutoff = new Date();
-  cutoff.setHours(0,0,0,0);
-  cutoff.setDate(cutoff.getDate()-(nDays-1));
-  return [...dailyLogs].filter(d=>{
-    const dt=new Date(d.date+"T00:00:00");
-    return dt>=cutoff;
-  }).sort((a,b)=>a.date.localeCompare(b.date));
-}
 
-function calcWeekScore(logs){
-  if(!logs.length) return {
-    total:0, exercise:0, postmeal:0, sleep:0, sugar:0, nutrition:0,
-    notes:["這週尚無足夠每日紀錄，先從每天記錄開始。"]
-  };
-  const days = Math.min(7, logs.length);
-  const recent = logs.slice(-7);
-  const totalExercise = recent.reduce((s,d)=>s+(Number(d.exercise)||0),0);
-  const ex = Math.min(100, totalExercise/150*100);
-  const post = Math.min(100, recent.filter(d=>(Number(d.postmeal)||0)>=10).length/5*100);
-  const sleep = Math.min(100, recent.filter(d=>Number(d.sleep)>=7 && Number(d.sleep)<=9).length/5*100);
-  const sugar = Math.min(100, recent.filter(d=>!d.sugary).length/6*100);
-  const nutrition = Math.min(100, recent.filter(d=>d.veg && !d.late).length/5*100);
 
-  // Weights prioritize glucose and weight related behaviors without pretending to predict disease risk
-  const total = Math.round(ex*0.25 + post*0.25 + sleep*0.20 + sugar*0.20 + nutrition*0.10);
-  const notes=[];
-  if(ex<70) notes.push("有氧活動還可以增加，先補到每週 150 分鐘。");
-  if(post<70) notes.push("飯後走路是目前最值得增加的項目，目標至少 5 天。");
-  if(sugar<80) notes.push("含糖飲仍有改善空間，先把一週大部分天數改成無糖。");
-  if(sleep<70) notes.push("睡眠達標率偏低，優先固定上床時間。");
-  if(nutrition<70) notes.push("蔬菜與晚餐時間仍可再穩定一些。");
-  if(!notes.length) notes.push("本週執行情況穩定，下週維持即可，不需要突然提高強度。");
 
-  return {total:Math.max(0,Math.min(100,total)),exercise:Math.round(ex),postmeal:Math.round(post),sleep:Math.round(sleep),sugar:Math.round(sugar),nutrition:Math.round(nutrition),notes};
-}
 
-function calcFourWeekScores(){
-  const logs = lastNDaysLogs(28);
-  const buckets=[[],[],[],[]];
-  if(!logs.length) return [];
-  const now=new Date(); now.setHours(0,0,0,0);
-  logs.forEach(d=>{
-    const dt=new Date(d.date+"T00:00:00");
-    const diff=Math.floor((now-dt)/(1000*60*60*24));
-    const idx=3-Math.min(3,Math.floor(diff/7));
-    if(idx>=0&&idx<4) buckets[idx].push(d);
-  });
-  return buckets.map((b,i)=>({label:`第${i+1}週`,score:calcWeekScore(b).total}));
-}
 
-function renderHealthScore(){
-  const recent=[...dailyLogs].sort((a,b)=>a.date.localeCompare(b.date)).slice(-7);
-  const sc=calcWeekScore(recent);
 
-  $("#healthScore").innerHTML=`
-    <div class="score-ring" style="--score:${sc.total}">
-      <div class="inside"><strong>${sc.total}</strong><span>/ 100</span></div>
-    </div>`;
 
-  const arr=[
-    ["有氧",sc.exercise,"每週 150 分鐘"],
-    ["飯後走",sc.postmeal,"至少 5 天"],
-    ["睡眠",sc.sleep,"7–9 小時"],
-    ["無糖飲",sc.sugar,"至少 6 天"],
-    ["飲食作息",sc.nutrition,"蔬菜＋晚餐時間"]
-  ];
-  $("#scoreBreakdown").innerHTML=arr.map(([nme,val,desc])=>`
-    <div class="score-card">
-      <span class="badge">${nme}</span>
-      <b>${val}%</b>
-      <small>${desc}</small>
-      <div class="progress"><span style="width:${val}%"></span></div>
-    </div>`).join("");
-
-  $("#scorePriorities").innerHTML=sc.notes.map(x=>`<div class="advice-item">${x}</div>`).join("");
-
-  const four=calcFourWeekScores();
-  drawLine($("#scoreTrend"),four.map(x=>x.score),four.map(x=>x.label),{min:0,max:100});
-  if(four.length){
-    const vals=four.map(x=>x.score);
-    const first=vals[0], last=vals[vals.length-1];
-    $("#scoreTrendText").innerHTML=`<p>最近 4 週：${vals.join(" → ")} 分。${last>first?"整體執行有進步。":last<first?"最近執行率有下降，建議先抓一項最容易做到的習慣。":"整體大致持平。"}</p>`;
-  } else {
-    $("#scoreTrendText").innerHTML="<p>累積每日紀錄後，這裡會顯示 4 週趨勢。</p>";
-  }
-
-  const l=latest(), plan=[];
-  const fg=n(l.fasting_glucose), eg=n(l.egfr), B=bmi(n(l.weight)||88);
-  if(fg!==null && fg>=100){
-    plan.push("維持「餐後走 10–15 分鐘」作為固定習慣，優先綁定晚餐。");
-    plan.push("主食先減少約 1/4，含糖飲盡量維持零。");
-  }
-  if(B>=27) plan.push("減重速度以每週約 0.25–0.5 kg 為較容易長期維持的節奏。");
-  if(eg!==null && eg<90) plan.push("避免高蛋白減重與大量蛋白粉，飲水與鈉攝取維持穩定。");
-  if(sc.sleep<70) plan.push("本週先把睡眠固定下來，再考慮增加運動量。");
-  if(sc.exercise<70) plan.push("若身體狀況允許，下週多增加 2 次 20–30 分鐘快走。");
-  if(!plan.length) plan.push("目前執行情況穩定，下週保持相同節奏並繼續記錄即可。");
-  $("#nextWeekPlan").innerHTML=plan.map(x=>`<div class="advice-item">${x}</div>`).join("");
-}
 
 const oldRenderV134 = render;
 render = function(){
@@ -894,302 +719,6 @@ window.addEventListener("load",()=>{
 });
 
 
-/* ===== V13.7 Stable + Xiaomi / Apple Health Bridge ===== */
-titles.wearable=["小米手錶","活動量、睡眠與心率透過 Apple Health / 捷徑同步"];
-
-let wearableRecords=[];
-
-function wearableLatest(){
-  const s=[...wearableRecords].sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-  return s[s.length-1]||{};
-}
-function wearableMetric(label,value,unit){
-  return `<article class="metric"><span>${label}</span><strong>${value}</strong><small>${unit}</small></article>`;
-}
-async function loadWearable(){
-  const api=localStorage.getItem("healthApiUrl")||"";
-  if(!api){
-    wearableRecords=JSON.parse(localStorage.getItem("wearableLocalData")||"[]");
-    renderWearable();
-    return;
-  }
-  try{
-    const d=await apiGet("wearable_list");
-    wearableRecords=Array.isArray(d.records)?d.records:[];
-    localStorage.setItem("wearableLocalData",JSON.stringify(wearableRecords));
-    renderWearable();
-  }catch(e){
-    wearableRecords=JSON.parse(localStorage.getItem("wearableLocalData")||"[]");
-    renderWearable();
-  }
-}
-function renderWearable(){
-  if(!$("#wearableMetrics")) return;
-  const l=wearableLatest();
-  $("#wearableMetrics").innerHTML =
-    wearableMetric("步數",l.steps?Number(l.steps).toLocaleString():"—","steps")+
-    wearableMetric("平均心率",fmt(n(l.avg_hr),0),"bpm")+
-    wearableMetric("靜息心率",fmt(n(l.resting_hr),0),"bpm")+
-    wearableMetric("睡眠",fmt(n(l.sleep_hours),1),"小時")+
-    wearableMetric("血氧",fmt(n(l.spo2),1),"%")+
-    wearableMetric("活動熱量",fmt(n(l.active_calories),0),"kcal");
-
-  const api=localStorage.getItem("healthApiUrl")||"";
-  const badge=$("#wearableSyncBadge");
-  if(l.date){
-    badge.textContent=`最新：${l.date}`;
-    badge.className="report-overall "+(api?"wearable-ok":"wearable-local");
-  }else{
-    badge.textContent="尚未同步";
-    badge.className="report-overall wearable-local";
-  }
-
-  const last14=[...wearableRecords].sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(-14);
-  drawLine($("#wearableStepsChart"),last14.map(x=>Number(x.steps)||0),last14.map(x=>String(x.date).slice(5)),{min:0});
-  drawLine($("#wearableSleepChart"),last14.map(x=>Number(x.sleep_hours)||0),last14.map(x=>String(x.date).slice(5)),{min:0,max:10});
-}
-async function saveWearableTest(){
-  const rec={
-    date:$("#wDate").value,
-    steps:n($("#wSteps").value),
-    avg_hr:n($("#wAvgHr").value),
-    resting_hr:n($("#wRestHr").value),
-    spo2:n($("#wSpo2").value),
-    sleep_hours:n($("#wSleep").value),
-    active_calories:n($("#wCalories").value),
-    distance_km:n($("#wDistance").value),
-    source:"manual_test"
-  };
-  if(!rec.date){$("#wearableMsg").textContent="請先選日期。";return}
-  const api=localStorage.getItem("healthApiUrl")||"";
-  if(api){
-    try{
-      await apiPost({action:"wearable_upsert",record:rec});
-      $("#wearableMsg").textContent="已寫入 Google Sheet wearable_daily。";
-      await loadWearable();
-      return;
-    }catch(e){
-      $("#wearableMsg").textContent="雲端寫入失敗，先存本機："+e.message;
-    }
-  }
-  const local=JSON.parse(localStorage.getItem("wearableLocalData")||"[]").filter(x=>x.date!==rec.date);
-  local.push(rec);local.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-  localStorage.setItem("wearableLocalData",JSON.stringify(local));wearableRecords=local;renderWearable();
-  $("#wearableMsg").textContent="已存本機。設定 Apps Script 後可同步雲端。";
-}
-
-const oldLoadDataV137 = (typeof loadDataV133==="function") ? loadDataV133 : null;
-if(oldLoadDataV137){
-  loadDataV133 = async function(){
-    await oldLoadDataV137();
-    await loadWearable();
-  };
-}
-const oldRenderV137 = render;
-render = function(){
-  oldRenderV137();
-  renderWearable();
-};
-
-window.addEventListener("load",()=>{
-  if($("#wDate")) $("#wDate").value=new Date().toISOString().slice(0,10);
-  const sw=$("#saveWearableBtn"); if(sw) sw.addEventListener("click",saveWearableTest);
-  const rw=$("#refreshWearableBtn"); if(rw) rw.addEventListener("click",loadWearable);
-  // V13.9.1: wearable data is loaded by the unified startup to avoid duplicate requests.
-});
-
-
-/* ===== V13.8 Xiaomi Smart Band 7 Tailored ===== */
-titles.wearable=["小米手環 7・Zepp Life","由 Zepp Life 經 Apple Health 同步可用的健康資料"];
-
-function bandAvg(field, days=14){
-  const s=[...wearableRecords].sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(-days);
-  const vals=s.map(x=>n(x[field])).filter(v=>v!==null);
-  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
-}
-function renderBandHealthLink(){
-  if(!$("#bandHealthLink")) return;
-  const avgSteps=bandAvg("steps"), avgSleep=bandAvg("sleep_hours"), avgRest=bandAvg("resting_hr"), avgSpo2=bandAvg("spo2");
-  const l=latest(), fg=n(l.fasting_glucose), B=bmi(n(l.weight)||88);
-  const items=[];
-  if(avgSteps!==null){
-    items.push(`近 14 天平均步數約 ${fmt(avgSteps,0)} 步/日。${avgSteps<6000?"目前活動量還有增加空間，可先多 1,000–1,500 步/日。":"目前日常活動量不錯，持續維持。"}`);
-  }
-  if(avgSleep!==null){
-    items.push(`近 14 天平均睡眠 ${fmt(avgSleep,1)} 小時。${avgSleep<7?"睡眠仍低於目前目標，優先固定上床時間。":"睡眠時數達到目前設定目標。"}`);
-  }
-  if(avgRest!==null){
-    items.push(`近 14 天平均靜息心率約 ${fmt(avgRest,0)} bpm。主要看個人長期基準與明顯變化，不以單次高低作診斷。`);
-  }
-  if(avgSpo2!==null){
-    items.push(`近 14 天平均血氧約 ${fmt(avgSpo2,1)}%。手環血氧適合看趨勢，若出現症狀或持續異常需用醫療方式確認。`);
-  }
-  if(fg!==null && fg>=100){
-    items.push("因空腹血糖長期偏高，系統會把步數、運動分鐘與餐後活動放在較高優先序。");
-  }
-  if(B>=27){
-    items.push("因 BMI 偏高，會把每日步數、活動熱量與體重一起看，避免只追求一次大量運動。");
-  }
-  $("#bandHealthLink").innerHTML=items.map(x=>`<div class="advice-item">${x}</div>`).join("")||`<div class="advice-item">先累積 7–14 天手環資料後，這裡會開始產生個人化分析。</div>`;
-}
-function renderWearableV138(){
-  if(!$("#wearableMetrics")) return;
-  const l=wearableLatest();
-  $("#wearableMetrics").innerHTML =
-    wearableMetric("步數",l.steps?Number(l.steps).toLocaleString():"—","steps")+
-    wearableMetric("活動熱量",fmt(n(l.active_calories),0),"kcal")+
-    wearableMetric("睡眠",fmt(n(l.sleep_hours),1),"小時")+
-    wearableMetric("靜息心率",fmt(n(l.resting_hr),0),"bpm")+
-    wearableMetric("平均血氧",fmt(n(l.spo2),1),"%")+
-    wearableMetric("運動",fmt(n(l.exercise_minutes),0),"分鐘");
-
-  const api=localStorage.getItem("healthApiUrl")||"";
-  const badge=$("#wearableSyncBadge");
-  if(l.date){
-    badge.textContent=`最新：${l.date}`;
-    badge.className="report-overall "+(api?"wearable-ok":"wearable-local");
-  }else{
-    badge.textContent="尚未同步";
-    badge.className="report-overall wearable-local";
-  }
-
-  const last14=[...wearableRecords].sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(-14);
-  const labs=last14.map(x=>String(x.date).slice(5));
-  drawLine($("#wearableStepsChart"),last14.map(x=>Number(x.steps)||0),labs,{min:0});
-  drawLine($("#wearableCaloriesChart"),last14.map(x=>Number(x.active_calories)||0),labs,{min:0});
-  drawLine($("#wearableSleepChart"),last14.map(x=>Number(x.sleep_hours)||0),labs,{min:0,max:10});
-  drawLine($("#wearableHrChart"),last14.map(x=>Number(x.resting_hr)||0),labs,{min:40,max:110});
-  drawLine($("#wearableSpo2Chart"),last14.map(x=>Number(x.spo2)||0),labs,{min:85,max:100});
-
-  const avgSleep=bandAvg("sleep_hours");
-  const avgDeep=bandAvg("deep_sleep_hours");
-  const avgRem=bandAvg("rem_sleep_hours");
-  $("#sleepSummary").innerHTML=`
-    <div class="band-score"><span>平均總睡眠</span><b>${fmt(avgSleep,1)} 小時</b></div>
-    <div class="band-score"><span>平均深睡</span><b>${fmt(avgDeep,1)} 小時</b></div>
-    <div class="band-score"><span>平均 REM</span><b>${fmt(avgRem,1)} 小時</b></div>`;
-  renderBandHealthLink();
-}
-
-async function saveWearableV138(){
-  const rec={
-    date:$("#wDate").value,
-    steps:n($("#wSteps").value),
-    distance_km:n($("#wDistance").value),
-    active_calories:n($("#wCalories").value),
-    exercise_minutes:n($("#wExerciseMinutes").value),
-    avg_hr:n($("#wAvgHr").value),
-    resting_hr:n($("#wRestHr").value),
-    spo2:n($("#wSpo2").value),
-    sleep_hours:n($("#wSleep").value),
-    deep_sleep_hours:n($("#wDeepSleep").value),
-    rem_sleep_hours:n($("#wRemSleep").value),
-    min_spo2:n($("#wMinSpo2").value),
-    source:"zepp_life_apple_health"
-  };
-  if(!rec.date){$("#wearableMsg").textContent="請先選日期。";return}
-  const api=localStorage.getItem("healthApiUrl")||"";
-  if(api){
-    try{
-      await apiPost({action:"wearable_upsert",record:rec});
-      $("#wearableMsg").textContent="已寫入 Google Sheet wearable_daily。";
-      await loadWearable();
-      return;
-    }catch(e){
-      $("#wearableMsg").textContent="雲端寫入失敗，先存本機："+e.message;
-    }
-  }
-  const local=JSON.parse(localStorage.getItem("wearableLocalData")||"[]").filter(x=>x.date!==rec.date);
-  local.push(rec);local.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-  localStorage.setItem("wearableLocalData",JSON.stringify(local));
-  wearableRecords=local;
-  renderWearableV138();
-  $("#wearableMsg").textContent="已存本機。";
-}
-
-renderWearable = renderWearableV138;
-
-window.addEventListener("load",()=>{
-  const old=$("#saveWearableBtn");
-  if(old){
-    const c=old.cloneNode(true);
-    old.replaceWith(c);
-    c.addEventListener("click",saveWearableV138);
-  }
-});
-
-
-/* ===== V13.9 Zepp Life Sync ===== */
-function zeppFieldStatus(){
-  const l=wearableLatest();
-  const fields=[
-    ["步數","steps"],
-    ["距離","distance_km"],
-    ["活動熱量","active_calories"],
-    ["運動分鐘","exercise_minutes"],
-    ["平均心率","avg_hr"],
-    ["靜息心率","resting_hr"],
-    ["血氧","spo2"],
-    ["睡眠總時數","sleep_hours"],
-    ["深睡","deep_sleep_hours"],
-    ["REM","rem_sleep_hours"]
-  ];
-  return fields.map(([label,key])=>({
-    label,key,available:n(l[key])!==null
-  }));
-}
-
-const renderWearableBeforeZepp = renderWearable;
-renderWearable = function(){
-  renderWearableBeforeZepp();
-  if(!$("#bandHealthLink")) return;
-
-  const statuses=zeppFieldStatus();
-  const available=statuses.filter(x=>x.available).map(x=>x.label);
-  const missing=statuses.filter(x=>!x.available).map(x=>x.label);
-
-  const extra=[];
-  extra.push(`<div class="advice-item"><span class="source-tag">資料來源</span> Zepp Life → Apple Health</div>`);
-  if(available.length){
-    extra.push(`<div class="advice-item"><b>目前已收到：</b>${available.join("、")}</div>`);
-  }
-  if(missing.length){
-    extra.push(`<div class="advice-item"><b>目前未收到：</b>${missing.join("、")}。若 Apple Health 本身沒有資料，系統會保持空白，不自行估算。</div>`);
-  }
-  $("#bandHealthLink").innerHTML += extra.join("");
-};
-
-async function testZeppBridge(){
-  const api=localStorage.getItem("healthApiUrl")||"";
-  if(!api){return {ok:false,msg:"尚未設定 Apps Script"}}
-  try{
-    const ping=await apiGet("ping");
-    const wear=await apiGet("wearable_list");
-    return {ok:true,msg:`Apps Script ${ping.version||""} 可連線；wearable_daily 目前 ${Array.isArray(wear.records)?wear.records.length:0} 筆。`};
-  }catch(e){
-    return {ok:false,msg:"Zepp Life 橋接接收端測試失敗："+e.message};
-  }
-}
-
-window.addEventListener("load",()=>{
-  const card = document.querySelector("#wearable article.card");
-  if(card && !document.querySelector("#zeppBridgeTestBtn")){
-    const box=document.createElement("div");
-    box.className="form-actions";
-    box.innerHTML='<button id="zeppBridgeTestBtn" class="secondary-btn">測試 Zepp Life 橋接接收端</button><span id="zeppBridgeMsg" class="small"></span>';
-    card.appendChild(box);
-    document.querySelector("#zeppBridgeTestBtn").addEventListener("click",async()=>{
-      const btn=document.querySelector("#zeppBridgeTestBtn");
-      btn.disabled=true;
-      document.querySelector("#zeppBridgeMsg").textContent="測試中…";
-      const r=await testZeppBridge();
-      document.querySelector("#zeppBridgeMsg").textContent=r.msg;
-      btn.disabled=false;
-    });
-  }
-});
-
-
 /* ===== V13.9.1 Unified Startup ===== */
 window.addEventListener("load", async ()=>{
   try{
@@ -1197,7 +726,7 @@ window.addEventListener("load", async ()=>{
       await loadDataV133();
     }else if(typeof loadData === "function"){
       await loadData();
-      if(typeof loadWearable === "function") await loadWearable();
+      
     }
   }catch(e){
     console.error("V13.9.1 startup error", e);

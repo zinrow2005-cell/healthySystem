@@ -1,0 +1,5 @@
+Navigation/pages match: True
+Navs: ['dashboard', 'trends', 'alerts', 'lifestyle', 'correlation', 'report', 'labs', 'add', 'settings']
+Wearable API removed: True
+Daily API removed: True
+Version V14.0: True
