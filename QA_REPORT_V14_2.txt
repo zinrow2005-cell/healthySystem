@@ -1,0 +1,12 @@
+V14.2 QA
+- Navigation/pages match: True
+- Duplicate HTML IDs: none
+- Missing JS DOM references: none
+- Residual dailyLogs: False
+- Residual renderDaily: False
+- Residual renderWeekly: False
+- Residual wearable: False
+- Correlation page removed: True
+- Weight log page present: True
+- Apps Script V14.2: True
+- Upsert supported: True

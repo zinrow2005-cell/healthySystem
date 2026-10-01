@@ -1,76 +1,58 @@
-const LAB_SHEET = 'health_records';
+const LAB_SHEET='health_records';
 
-function doGet(e) {
-  const action = (e && e.parameter && e.parameter.action) || 'list';
-  if (action === 'ping') return json_({ok:true, version:'V14.0'});
-  if (action === 'list') return listSheet_(LAB_SHEET, getLabHeaders_());
+function doGet(e){
+  const action=(e&&e.parameter&&e.parameter.action)||'list';
+  if(action==='ping') return json_({ok:true,version:'V14.3'});
+  if(action==='list') return list_();
   return json_({ok:false,error:'unknown action'});
 }
-
-function doPost(e) {
-  try {
-    const body = JSON.parse(e.postData.contents || '{}');
-    if (body.action === 'add') return appendRecord_(LAB_SHEET, getLabHeaders_(), body.record || {});
+function doPost(e){
+  try{
+    const body=JSON.parse((e&&e.postData&&e.postData.contents)||'{}');
+    if(body.action==='upsert'||body.action==='add') return upsert_(body.record||{});
     return json_({ok:false,error:'unknown action'});
-  } catch (err) {
-    return json_({ok:false,error:String(err)});
-  }
+  }catch(err){return json_({ok:false,error:String(err)})}
 }
-
-function listSheet_(sheetName, headers) {
-  const sh = getSheet_(sheetName, headers);
-  const values = sh.getDataRange().getValues();
-  if (values.length < 2) return json_({ok:true,records:[]});
-  const hs = values[0].map(String);
-  const records = values.slice(1).filter(r=>r[0]).map(row=>{
-    const obj = {};
-    hs.forEach((h,i)=>{
-      let v=row[i];
-      if (v instanceof Date) v=Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyy-MM-dd');
-      obj[h]=v;
-    });
-    return obj;
-  });
-  return json_({ok:true,records:records});
+function headers_(){
+  return ['date','weight','systolic_bp','diastolic_bp','fasting_glucose','hba1c','creatinine','bun','egfr','uric_acid','uacr','urine_protein','urine_blood','total_cholesterol','ldl','hdl','triglycerides','ast','alt','ggt','sodium','potassium','hb','hct','rbc','wbc','plt','mcv','mch','mchc','pt','inr','ptt'];
 }
-
-function appendRecord_(sheetName, headers, record) {
-  if (!record.date) return json_({ok:false,error:'date required'});
-  const sh = getSheet_(sheetName, headers);
-  sh.appendRow(headers.map(h => record[h] === undefined || record[h] === null ? '' : record[h]));
-  return json_({ok:true});
-}
-
-
-
-
-
-
-
-
-function getSheet_(sheetName, headers) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sh = ss.getSheetByName(sheetName);
-  if (!sh) {
-    sh = ss.insertSheet(sheetName);
-    sh.appendRow(headers);
-  } else if (sh.getLastRow() === 0) {
-    sh.appendRow(headers);
-  }
+function sheet_(){
+  const ss=SpreadsheetApp.getActiveSpreadsheet();
+  let sh=ss.getSheetByName(LAB_SHEET);
+  if(!sh){sh=ss.insertSheet(LAB_SHEET);sh.appendRow(headers_());return sh}
+  if(sh.getLastRow()===0){sh.appendRow(headers_());return sh}
+  const current=sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0].map(String);
+  const missing=headers_().filter(h=>!current.includes(h));
+  if(missing.length) sh.getRange(1,current.length+1,1,missing.length).setValues([missing]);
   return sh;
 }
-
-function getLabHeaders_() {
-  return [
-    'date','weight','systolic_bp','diastolic_bp',
-    'fasting_glucose','hba1c',
-    'creatinine','bun','egfr','uric_acid','uacr','urine_protein','urine_blood',
-    'total_cholesterol','ldl','hdl','triglycerides',
-    'ast','alt','ggt','sodium','potassium',
-    'hb','hct','rbc','wbc','plt','mcv','mch','mchc','pt','inr','ptt'
-  ];
+function currentHeaders_(sh){
+  return sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0].map(String);
 }
-
-function json_(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+function list_(){
+  const sh=sheet_(),hs=currentHeaders_(sh),values=sh.getDataRange().getValues();
+  if(values.length<2)return json_({ok:true,records:[]});
+  const records=values.slice(1).filter(r=>r[0]).map(row=>{
+    const o={};hs.forEach((h,i)=>{let v=row[i];if(v instanceof Date)v=Utilities.formatDate(v,Session.getScriptTimeZone(),'yyyy-MM-dd');o[h]=v});return o
+  });
+  return json_({ok:true,records});
 }
+function upsert_(record){
+  if(!record.date)return json_({ok:false,error:'date required'});
+  const sh=sheet_(),hs=currentHeaders_(sh),values=sh.getDataRange().getValues();
+  let rowNum=-1;
+  for(let i=1;i<values.length;i++){
+    let d=values[i][0];if(d instanceof Date)d=Utilities.formatDate(d,Session.getScriptTimeZone(),'yyyy-MM-dd');
+    if(String(d)===String(record.date)){rowNum=i+1;break}
+  }
+  const clean={};Object.keys(record).forEach(k=>{const v=record[k];if(v!==null&&v!==undefined&&v!=="")clean[k]=v});
+  if(rowNum<0){
+    sh.appendRow(hs.map(h=>clean[h]!==undefined?clean[h]:''));
+  }else{
+    const existing=sh.getRange(rowNum,1,1,hs.length).getValues()[0];
+    hs.forEach((h,i)=>{if(clean[h]!==undefined)existing[i]=clean[h]});
+    sh.getRange(rowNum,1,1,hs.length).setValues([existing]);
+  }
+  return json_({ok:true});
+}
+function json_(obj){return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON)}

@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="健康監測">
-  <title>健康監測 V14.0</title>
+  <title>健康監測 V14.3</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -16,14 +16,14 @@
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-mark">❤</div>
-      <div><div class="brand-title">健康監測</div><div class="brand-sub">V14.0 Weight + Health</div></div>
+      <div><div class="brand-title">健康監測</div><div class="brand-sub">V14.3 Mobile Redesign</div></div>
     </div>
     <nav>
       <button class="nav-btn active" data-page="dashboard">🏠 <span>健康總覽</span></button>
+      <button class="nav-btn" data-page="weightlog">⚖️ <span>體重紀錄</span></button>
       <button class="nav-btn" data-page="trends">📈 <span>趨勢分析</span></button>
       <button class="nav-btn" data-page="alerts">🚦 <span>異常提醒</span></button>
       <button class="nav-btn" data-page="lifestyle">🥗 <span>健康建議</span></button>
-      <button class="nav-btn" data-page="correlation">🔗 <span>檢驗×生活關聯</span></button>
       <button class="nav-btn" data-page="report">🧾 <span>健康報告</span></button>
       <button class="nav-btn" data-page="labs">📋 <span>全部檢驗</span></button>
       <button class="nav-btn" data-page="add">➕ <span>新增檢驗</span></button>
@@ -66,6 +66,45 @@
       </article>
     </section>
 
+
+    <section class="page" id="weightlog">
+      <div class="grid two">
+        <article class="card">
+          <h2>新增體重</h2>
+          <p class="small">建議固定在相近條件下量，例如早上起床、上完廁所、早餐前。</p>
+          <div class="form-grid">
+            <label>日期<input id="wtDate" type="date"></label>
+            <label>體重 kg<input id="wtWeight" type="number" step="0.1" inputmode="decimal" placeholder="例如 88.0"></label>
+          </div>
+          <div class="form-actions">
+            <button id="saveWeightBtn" class="primary-btn">儲存體重</button>
+          </div>
+          <p id="weightMsg" class="small"></p>
+        </article>
+
+        <article class="card">
+          <h2>目前體重狀態</h2>
+          <div id="weightSummary"></div>
+        </article>
+      </div>
+
+      <article class="card">
+        <h2>體重趨勢</h2>
+        <div class="chart-wrap"><canvas id="weightLogChart"></canvas></div>
+        <div id="weightTrendText"></div>
+      </article>
+
+      <article class="card">
+        <h2>體重紀錄</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>日期</th><th>體重</th><th>BMI</th><th>與前次差異</th></tr></thead>
+            <tbody id="weightLogBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
     <section class="page" id="trends">
       <div class="grid two">
         <article class="card"><h2>空腹血糖</h2><div class="chart-wrap"><canvas id="trendGlucose"></canvas></div><div id="trendGlucoseText"></div></article>
@@ -103,66 +142,7 @@
         <article class="card notice"><h2>目前執行重點</h2><div id="actionAdvice"></div></article>
       </div>
     </section>
-<section class="page" id="correlation">
-      <article class="card">
-        <h2>檢驗 × 生活習慣關聯</h2>
-        <p class="small">這裡比較「某次抽血前一段時間的生活紀錄」與下一次檢驗變化，只顯示關聯，不把它當成因果證明。</p>
-        <div id="correlationSummary" class="alert-grid"></div>
-      </article>
-
-      <div class="grid two">
-        <article class="card">
-          <h2>HbA1c 前 90 天生活</h2>
-          <div class="chart-wrap"><canvas id="corrA1cChart"></canvas></div>
-          <div id="corrA1cText"></div>
-        </article>
-        <article class="card">
-          <h2>空腹血糖前 30 天生活</h2>
-          <div class="chart-wrap"><canvas id="corrGlucoseChart"></canvas></div>
-          <div id="corrGlucoseText"></div>
-        </article>
-      </div>
-
-      <div class="grid two">
-        <article class="card">
-          <h2>體重與血糖變化</h2>
-          <div class="chart-wrap"><canvas id="corrWeightChart"></canvas></div>
-          <div id="corrWeightText"></div>
-        </article>
-        <article class="card">
-          <h2>腎功能前 30 天生活</h2>
-          <div class="chart-wrap"><canvas id="corrKidneyChart"></canvas></div>
-          <div id="corrKidneyText"></div>
-        </article>
-      </div>
-
-      <article class="card">
-        <h2>每次檢驗前的生活摘要</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>檢驗日</th><th>前期紀錄天數</th><th>平均體重</th><th>平均有氧</th>
-                <th>飯後走達標率</th><th>無糖飲率</th><th>睡眠達標率</th>
-              </tr>
-            </thead>
-            <tbody id="preLabLifestyleBody"></tbody>
-          </table>
-        </div>
-      </article>
-
-      <article class="card notice">
-        <h2>如何解讀</h2>
-        <div class="advice-list">
-          <div class="advice-item">HbA1c 約反映前 2–3 個月平均血糖，因此本頁優先使用抽血前 90 天的生活紀錄。</div>
-          <div class="advice-item">空腹血糖、體重與 BUN/Creatinine 受近期狀態影響較多，因此本頁另外看抽血前約 30 天。</div>
-          <div class="advice-item">資料量太少時，系統會直接顯示「資料不足」，不會硬算結論。</div>
-        </div>
-      </article>
-    </section>
-
-
-    <section class="page" id="report">
+<section class="page" id="report">
       <article class="card report-toolbar">
         <div>
           <h2>本次健康報告</h2>

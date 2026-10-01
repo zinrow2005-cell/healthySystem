@@ -1,0 +1,6 @@
+V14.1 QA
+Navigation/pages match: True
+Weight log page present: True
+Save weight button present: True
+Weight chart present: True
+Apps Script version V14.1: True
