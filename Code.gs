@@ -2,7 +2,7 @@ const LAB_SHEET='health_records';
 
 function doGet(e){
   const action=(e&&e.parameter&&e.parameter.action)||'list';
-  if(action==='ping') return json_({ok:true,version:'V14.3'});
+  if(action==='ping') return json_({ok:true,version:'V14.4'});
   if(action==='list') return list_();
   return json_({ok:false,error:'unknown action'});
 }
@@ -10,6 +10,7 @@ function doPost(e){
   try{
     const body=JSON.parse((e&&e.postData&&e.postData.contents)||'{}');
     if(body.action==='upsert'||body.action==='add') return upsert_(body.record||{});
+    if(body.action==='delete_weight') return deleteWeight_(body.date||'');
     return json_({ok:false,error:'unknown action'});
   }catch(err){return json_({ok:false,error:String(err)})}
 }
@@ -56,3 +57,21 @@ function upsert_(record){
   return json_({ok:true});
 }
 function json_(obj){return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON)}
+
+function deleteWeight_(date){
+  if(!date)return json_({ok:false,error:'date required'});
+  const sh=sheet_(),hs=currentHeaders_(sh),values=sh.getDataRange().getValues();
+  const widx=hs.indexOf('weight');
+  if(widx<0)return json_({ok:false,error:'weight column missing'});
+  for(let i=1;i<values.length;i++){
+    let d=values[i][0];if(d instanceof Date)d=Utilities.formatDate(d,Session.getScriptTimeZone(),'yyyy-MM-dd');
+    if(String(d)===String(date)){
+      sh.getRange(i+1,widx+1).clearContent();
+      const row=sh.getRange(i+1,1,1,hs.length).getValues()[0];
+      const nonDate=row.slice(1).some(v=>v!==''&&v!==null);
+      if(!nonDate) sh.deleteRow(i+1);
+      return json_({ok:true});
+    }
+  }
+  return json_({ok:true});
+}

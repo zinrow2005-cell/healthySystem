@@ -1,11 +1,4 @@
-const SAMPLE_DATA = [
-  {date:"2024-01-01", fasting_glucose:124, hba1c:5.5, creatinine:1.20, egfr:72, uric_acid:5.0, weight:88},
-  {date:"2025-06-01", fasting_glucose:118, hba1c:5.8, creatinine:1.19, egfr:70, uric_acid:7.7, weight:88},
-  {date:"2026-04-01", fasting_glucose:121, hba1c:6.0, creatinine:1.40, egfr:62, uric_acid:2.8, weight:88},
-  {date:"2026-09-21", fasting_glucose:122, hba1c:5.6, creatinine:1.27, bun:25, egfr:72.79, uric_acid:3.2, alt:27,
-   sodium:141, potassium:4.6, hb:14.3, hct:44.1, rbc:5.11, wbc:6.12, plt:278, mcv:86.3, mch:28.0,
-   mchc:32.4, pt:9.8, inr:0.91, ptt:30.0, weight:88}
-];
+const SAMPLE_DATA = [];
 const HEIGHT_M=1.74;
 let records=[];
 
@@ -22,7 +15,8 @@ const titles={
   report:["健康報告","比較最近一次與歷史資料，整理下一步"],
   labs:["全部檢驗","查看歷次健康與檢驗資料"],
   add:["新增完整檢驗","有驗的項目才填，留白不會當成 0"],
-  settings:["資料連線","Google Sheet + Apps Script"]
+  settings:["資料連線","Google Sheet + Apps Script"],
+  more:["更多","異常提醒、健康建議、報告、檢驗與設定"]
 };
 
 function sorted(){
@@ -30,6 +24,20 @@ function sorted(){
 }
 function latest(){
   const s=sorted(); return s[s.length-1]||{};
+}
+
+function latestNonNull(field){
+  const a=sorted().filter(r=>n(r[field])!==null);
+  return a.length ? n(a[a.length-1][field]) : null;
+}
+function latestNonNullRecord(field){
+  const a=sorted().filter(r=>n(r[field])!==null);
+  return a.length ? a[a.length-1] : null;
+}
+function latestLabRecord(){
+  const labFields=["fasting_glucose","hba1c","creatinine","bun","egfr","uric_acid","uacr","total_cholesterol","ldl","hdl","triglycerides","ast","alt","ggt","sodium","potassium","hb","hct","rbc","wbc","plt","mcv","mch","mchc","pt","inr","ptt","systolic_bp","diastolic_bp"];
+  const a=sorted().filter(r=>labFields.some(f=>n(r[f])!==null));
+  return a.length ? a[a.length-1] : {};
 }
 function values(field){
   return sorted().filter(r=>n(r[field])!==null).map(r=>n(r[field]));
@@ -97,20 +105,20 @@ function statusFor(field,val){
 }
 
 function renderDashboard(){
-  const l=latest(), w=n(l.weight)||88, B=bmi(w);
+  const l=latestLabRecord(), w=latestNonNull("weight"), B=bmi(w);
   const metric=(label,value,unit,status="")=>`<article class="metric ${status}"><span>${label}</span><strong>${value}</strong><small>${unit}</small></article>`;
   $("#metricGrid").innerHTML=
     metric("體重",fmt(w,1),"kg")+
     metric("BMI",fmt(B,1),B>=27?"偏高":"")+
-    metric("空腹血糖",fmt(n(l.fasting_glucose),0),"mg/dL","warn")+
-    metric("HbA1c",fmt(n(l.hba1c),1),"%")+
-    metric("Creatinine",fmt(n(l.creatinine),2),"mg/dL","caution")+
-    metric("eGFR",fmt(n(l.egfr),1),"mL/min/1.73m²","caution");
+    metric("空腹血糖",fmt(latestNonNull("fasting_glucose"),0),"mg/dL","warn")+
+    metric("HbA1c",fmt(latestNonNull("hba1c"),1),"%")+
+    metric("Creatinine",fmt(latestNonNull("creatinine"),2),"mg/dL","caution")+
+    metric("eGFR",fmt(latestNonNull("egfr"),1),"mL/min/1.73m²","caution");
 
   const pri=[];
-  if(n(l.fasting_glucose)>=100) pri.push(["優先管理","空腹血糖長期偏高：先從含糖飲、精緻澱粉與體重管理著手。","orange"]);
+  if(latestNonNull("fasting_glucose")>=100) pri.push(["優先管理","空腹血糖長期偏高：先從含糖飲、精緻澱粉與體重管理著手。","orange"]);
   if(B>=27) pri.push(["第二優先","體重偏高：先以 3–6 個月減少 5–7% 為階段目標。","yellow"]);
-  if(n(l.egfr)!==null&&n(l.egfr)<90) pri.push(["持續追蹤","腎功能較前次改善，但仍應搭配 Creatinine、eGFR 與尿蛋白 / uACR 追蹤。","yellow"]);
+  if(latestNonNull("egfr")!==null&&latestNonNull("egfr")<90) pri.push(["持續追蹤","腎功能較前次改善，但仍應搭配 Creatinine、eGFR 與尿蛋白 / uACR 追蹤。","yellow"]);
   pri.push(["目前穩定","血球、凝血、電解質與 ALT 目前沒有明顯警訊。","green"]);
   $("#priorityList").innerHTML=pri.map(x=>`<div class="status-row ${x[2]}"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("");
 
@@ -152,12 +160,12 @@ function renderTrends(){
 }
 
 function renderAlerts(){
-  const l=latest(), w=n(l.weight)||88, B=bmi(w);
+  const l=latestLabRecord(), w=latestNonNull("weight"), B=bmi(w);
   const cards=[];
   const add=(title,val,field,display)=>{if(val===null)return;const st=statusFor(field,val);cards.push(`<div class="alert-card ${st.level==="watch"?"yellow":"green"}"><h3>${title}</h3><p><b>${display}</b><br>${st.text}</p></div>`)};
-  add("空腹血糖",n(l.fasting_glucose),"fasting_glucose",`${fmt(n(l.fasting_glucose),0)} mg/dL`);
-  add("HbA1c",n(l.hba1c),"hba1c",`${fmt(n(l.hba1c),1)}%`);
-  add("eGFR",n(l.egfr),"egfr",fmt(n(l.egfr),1));
+  add("空腹血糖",latestNonNull("fasting_glucose"),"fasting_glucose",`${fmt(latestNonNull("fasting_glucose"),0)} mg/dL`);
+  add("HbA1c",latestNonNull("hba1c"),"hba1c",`${fmt(latestNonNull("hba1c"),1)}%`);
+  add("eGFR",latestNonNull("egfr"),"egfr",fmt(latestNonNull("egfr"),1));
   cards.push(`<div class="alert-card ${B>=27?"yellow":"green"}"><h3>BMI</h3><p><b>${fmt(B,1)}</b><br>${B>=27?"目前偏高，先以 5–7% 減重為目標":"目前較理想"}</p></div>`);
   $("#alertCards").innerHTML=cards.join("");
 
@@ -170,14 +178,14 @@ function renderAlerts(){
 }
 
 function renderLifestyle(){
-  const l=latest(), w=n(l.weight)||88, B=bmi(w), diet=[];
-  if(n(l.fasting_glucose)>=100){
+  const l=latest(), w=n(l.weight), B=bmi(w), diet=[];
+  if(latestNonNull("fasting_glucose")>=100){
     diet.push("每餐把白飯、麵、稀飯等精緻澱粉先減少約 1/4，優先選較高纖來源。");
     diet.push("含糖飲、果汁與加糖咖啡盡量歸零；水果吃完整水果，不以果汁取代。");
     diet.push("用餐順序可改成蔬菜 → 蛋白質 → 主食，並避免單餐大量澱粉。");
   }
   if(B>=27) diet.push("先設定 3–6 個月減少 5–7% 體重，不採快速減重。");
-  if(n(l.egfr)!==null&&n(l.egfr)<90){
+  if(latestNonNull("egfr")!==null&&latestNonNull("egfr")<90){
     diet.push("避免自行採高蛋白減重法或大量蛋白粉；蛋白質以一般份量平均分配。");
     diet.push("少濃湯、加工肉、醃漬物與重鹹醬料，對血壓與腎臟較有利。");
   }
@@ -214,8 +222,8 @@ function renderWeightLog(){
   const rows=weightRows(), rev=[...rows].reverse();
   $("#weightLogBody").innerHTML=rev.map((r,idx)=>{
     const prev=rev[idx+1],d=prev?r.weight-prev.weight:null,cls=d===null?"delta-neutral":d<0?"delta-good":d>0?"delta-watch":"delta-neutral";
-    return `<tr><td>${r.date}</td><td>${fmt(r.weight,1)} kg</td><td>${fmt(bmi(r.weight),1)}</td><td class="${cls}">${d===null?"—":`${d>0?"+":""}${fmt(d,1)} kg`}</td></tr>`;
-  }).join("")||`<tr><td colspan="4">尚無體重紀錄</td></tr>`;
+    return `<tr><td>${r.date}</td><td>${fmt(r.weight,1)} kg</td><td>${fmt(bmi(r.weight),1)}</td><td class="${cls}">${d===null?"—":`${d>0?"+":""}${fmt(d,1)} kg`}</td><td><div class="table-action"><button class="edit-weight" data-date="${r.date}">編輯</button><button class="delete-weight" data-date="${r.date}">刪除</button></div></td></tr>`;
+  }).join("")||`<tr><td colspan="5">尚無體重紀錄</td></tr>`;
   drawLine($("#weightLogChart"),rows.map(x=>x.weight),rows.map(x=>x.date.slice(5)));
   if(rows.length){
     const first=rows[0],last=rows[rows.length-1],diff=last.weight-first.weight;
@@ -249,7 +257,7 @@ function renderLabs(){
 }
 
 function renderReport(){
-  const l=latest();
+  const l=latestLabRecord();
   $("#reportDate").textContent=l.date?`最近一次資料：${l.date}`:"尚無資料";
   const improved=[],watch=[],stable=[],table=[];
   Object.entries(LAB_META).forEach(([f,m])=>{
@@ -267,10 +275,10 @@ function renderReport(){
   $("#reportStable").innerHTML=(stable.length?stable:["資料不足。"]).slice(0,12).map(x=>`<div class="advice-item">${x}</div>`).join("");
   $("#reportLabTable").innerHTML=table.join("");
 
-  const w=n(l.weight)||88,plan=[];
-  if(n(l.fasting_glucose)>=100) plan.push("未來 4–12 週先固定：含糖飲接近零、主食份量先減約 1/4。");
+  const w=n(l.weight),plan=[];
+  if(latestNonNull("fasting_glucose")>=100) plan.push("未來 4–12 週先固定：含糖飲接近零、主食份量先減約 1/4。");
   if(bmi(w)>=27) plan.push(`體重第一階段可先往約 ${fmt(w*.93,1)}–${fmt(w*.95,1)} kg 前進。`);
-  if(n(l.egfr)!==null&&n(l.egfr)<90) plan.push("下一次複查腎功能時，可一併確認 uACR / 尿蛋白，並避免自行高蛋白減重。");
+  if(latestNonNull("egfr")!==null&&latestNonNull("egfr")<90) plan.push("下一次複查腎功能時，可一併確認 uACR / 尿蛋白，並避免自行高蛋白減重。");
   plan.push("複查頻率依醫師安排；若趨勢明顯惡化或出現症狀，提早就醫。");
   $("#reportPlan").innerHTML=plan.map(x=>`<div class="advice-item">${x}</div>`).join("");
 
@@ -283,13 +291,13 @@ function renderReport(){
   $("#reportOverall").textContent=watch.length>=4?"多項需追蹤":watch.length?"持續管理":"目前大致穩定";
 }
 function reportText(){
-  const l=latest(),w=n(l.weight)||88;
+  const l=latest(),w=n(l.weight);
   return [
     `健康追蹤摘要｜${l.date||""}`,
-    n(l.fasting_glucose)!==null?`空腹血糖：${fmt(n(l.fasting_glucose),0)} mg/dL`:"",
-    n(l.hba1c)!==null?`HbA1c：${fmt(n(l.hba1c),1)}%`:"",
-    n(l.creatinine)!==null?`Creatinine：${fmt(n(l.creatinine),2)} mg/dL`:"",
-    n(l.egfr)!==null?`eGFR：${fmt(n(l.egfr),1)}`:"",
+    latestNonNull("fasting_glucose")!==null?`空腹血糖：${fmt(latestNonNull("fasting_glucose"),0)} mg/dL`:"",
+    latestNonNull("hba1c")!==null?`HbA1c：${fmt(latestNonNull("hba1c"),1)}%`:"",
+    latestNonNull("creatinine")!==null?`Creatinine：${fmt(latestNonNull("creatinine"),2)} mg/dL`:"",
+    latestNonNull("egfr")!==null?`eGFR：${fmt(latestNonNull("egfr"),1)}`:"",
     `體重：${fmt(w,1)} kg，BMI 約 ${fmt(bmi(w),1)}`,
     "",
     "本摘要為健康管理用途，不取代醫師診斷與用藥調整。"
@@ -356,6 +364,7 @@ function labFormRecord(){
 }
 async function saveLab(){
   const r=labFormRecord();if(!r.date){$("#saveMsg").textContent="請先選日期。";return}
+  if(!validateLabRecord(r)) return;
   await saveRecord(r,$("#saveMsg"));
 }
 function clearLabForm(){
@@ -365,7 +374,7 @@ function clearLabForm(){
 
 function renderAll(){
   renderDashboard();renderWeightLog();renderTrends();renderAlerts();renderLifestyle();renderLabs();renderReport();
-  const l=latest();$("#settingsWeight").textContent=`${fmt(n(l.weight)||88,1)} kg`;
+  const l=latest();const sw=latestNonNull("weight"); $("#settingsWeight").textContent=sw===null?"尚無體重":`${fmt(sw,1)} kg`;
 }
 function setPage(id){
   document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
@@ -396,3 +405,80 @@ const today=new Date().toISOString().slice(0,10);$("#fDate").value=today;$("#wtD
 window.addEventListener("resize",()=>requestAnimationFrame(renderAll));
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 loadData();
+
+async function deleteWeightRecord(date){
+  if(!confirm(`確定刪除 ${date} 的體重紀錄嗎？`)) return;
+  const api=localStorage.getItem("healthApiUrl")||"";
+  if(api){
+    try{
+      await apiPost({action:"delete_weight",date});
+      await loadData(); return;
+    }catch(e){ alert("雲端刪除失敗："+e.message); return; }
+  }
+  const local=JSON.parse(localStorage.getItem("healthLocalData")||"[]");
+  const idx=local.findIndex(x=>x.date===date);
+  if(idx>=0){
+    local[idx].weight=null;
+    if(Object.entries(local[idx]).filter(([k,v])=>k!=="date"&&v!==null&&v!==""&&v!==undefined).length===0) local.splice(idx,1);
+  }
+  localStorage.setItem("healthLocalData",JSON.stringify(local));records=local;renderAll();
+}
+function editWeightRecord(date){
+  const r=sorted().find(x=>x.date===date);
+  if(!r) return;
+  $("#wtDate").value=date;
+  $("#wtWeight").value=n(r.weight)??"";
+  setPage("weightlog");
+  $("#wtWeight").focus();
+}
+document.addEventListener("click",e=>{
+  const edit=e.target.closest(".edit-weight"); if(edit) editWeightRecord(edit.dataset.date);
+  const del=e.target.closest(".delete-weight"); if(del) deleteWeightRecord(del.dataset.date);
+  const more=e.target.closest(".more-card"); if(more) setPage(more.dataset.openPage);
+});
+
+function validateLabRecord(r){
+  const limits={
+    weight:[30,250],systolic_bp:[60,260],diastolic_bp:[30,160],fasting_glucose:[30,600],hba1c:[3,20],
+    creatinine:[0.2,20],bun:[2,200],egfr:[1,200],uric_acid:[0.5,20],uacr:[0,5000],
+    total_cholesterol:[50,800],ldl:[10,500],hdl:[5,200],triglycerides:[10,3000],
+    ast:[1,2000],alt:[1,2000],ggt:[1,3000],sodium:[100,180],potassium:[1.5,9],
+    hb:[3,25],hct:[10,75],rbc:[1,9],wbc:[0.5,100],plt:[10,1500],mcv:[40,150],mch:[10,60],mchc:[15,50],
+    pt:[5,60],inr:[0.3,10],ptt:[10,150]
+  };
+  const odd=[];
+  Object.entries(limits).forEach(([f,[lo,hi]])=>{
+    const v=n(r[f]); if(v!==null&&(v<lo||v>hi)) odd.push(`${LAB_META[f]?.[0]||f}: ${v}`);
+  });
+  if(!odd.length) return true;
+  return confirm("以下數值看起來不尋常：\n\n"+odd.join("\n")+"\n\n仍要儲存嗎？");
+}
+
+const LAB_GROUPS={
+  glucose:["fasting_glucose","hba1c"],
+  kidney:["creatinine","bun","egfr","uacr","urine_protein","urine_blood"],
+  uric:["uric_acid"],
+  lipid:["total_cholesterol","ldl","hdl","triglycerides"],
+  liver:["ast","alt","ggt"],
+  cbc:["hb","hct","rbc","wbc","plt","mcv","mch","mchc"],
+  bp:["systolic_bp","diastolic_bp"]
+};
+const renderLabsBase=renderLabs;
+renderLabs=function(){
+  const filter=$("#labFilter")?.value||"all";
+  const q=($("#labSearch")?.value||"").trim().toLowerCase();
+  const fields=filter==="all"?Object.keys(LAB_META):(LAB_GROUPS[filter]||[]);
+  const rows=[];
+  sorted().slice().reverse().forEach(r=>{
+    fields.forEach(k=>{
+      const m=LAB_META[k]; if(!m||n(r[k])===null)return;
+      if(q && !m[0].toLowerCase().includes(q)) return;
+      rows.push(`<tr><td>${r.date}</td><td>${m[0]}</td><td>${fmt(n(r[k]),m[2])}</td><td>${m[1]}</td></tr>`);
+    });
+  });
+  $("#labTableBody").innerHTML=rows.join("")||`<tr><td colspan="4">沒有符合條件的資料</td></tr>`;
+};
+window.addEventListener("load",()=>{
+  $("#labFilter")?.addEventListener("change",renderLabs);
+  $("#labSearch")?.addEventListener("input",renderLabs);
+});

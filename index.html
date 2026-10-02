@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="健康監測">
-  <title>健康監測 V14.3</title>
+  <title>健康監測 V14.4</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -16,18 +16,19 @@
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-mark">❤</div>
-      <div><div class="brand-title">健康監測</div><div class="brand-sub">V14.3 Mobile Redesign</div></div>
+      <div><div class="brand-title">健康監測</div><div class="brand-sub">V14.4 LongTerm Stable</div></div>
     </div>
     <nav>
       <button class="nav-btn active" data-page="dashboard">🏠 <span>健康總覽</span></button>
       <button class="nav-btn" data-page="weightlog">⚖️ <span>體重紀錄</span></button>
       <button class="nav-btn" data-page="trends">📈 <span>趨勢分析</span></button>
-      <button class="nav-btn" data-page="alerts">🚦 <span>異常提醒</span></button>
-      <button class="nav-btn" data-page="lifestyle">🥗 <span>健康建議</span></button>
-      <button class="nav-btn" data-page="report">🧾 <span>健康報告</span></button>
-      <button class="nav-btn" data-page="labs">📋 <span>全部檢驗</span></button>
-      <button class="nav-btn" data-page="add">➕ <span>新增檢驗</span></button>
-      <button class="nav-btn" data-page="settings">⚙️ <span>資料連線</span></button>
+      <button class="nav-btn secondary-nav" data-page="alerts">🚦 <span>異常提醒</span></button>
+      <button class="nav-btn secondary-nav" data-page="lifestyle">🥗 <span>健康建議</span></button>
+      <button class="nav-btn secondary-nav" data-page="report">🧾 <span>健康報告</span></button>
+      <button class="nav-btn secondary-nav" data-page="labs">📋 <span>全部檢驗</span></button>
+      <button class="nav-btn" data-page="add">➕ <span>新增</span></button>
+      <button class="nav-btn more-nav" data-page="more">••• <span>更多</span></button>
+      <button class="nav-btn secondary-nav" data-page="settings">⚙️ <span>資料連線</span></button>
     </nav>
   </aside>
 
@@ -98,7 +99,7 @@
         <h2>體重紀錄</h2>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>日期</th><th>體重</th><th>BMI</th><th>與前次差異</th></tr></thead>
+            <thead><tr><th>日期</th><th>體重</th><th>BMI</th><th>與前次差異</th><th>操作</th></tr></thead>
             <tbody id="weightLogBody"></tbody>
           </table>
         </div>
@@ -200,7 +201,21 @@
       </div>
     </section>
 <section class="page" id="labs">
-      <article class="card"><h2>檢驗紀錄</h2><div class="table-wrap"><table>
+      <article class="card"><h2>檢驗紀錄</h2>
+        <div class="filter-row">
+          <select id="labFilter">
+            <option value="all">全部</option>
+            <option value="glucose">血糖</option>
+            <option value="kidney">腎功能</option>
+            <option value="uric">尿酸</option>
+            <option value="lipid">血脂</option>
+            <option value="liver">肝功能</option>
+            <option value="cbc">血球</option>
+            <option value="bp">血壓</option>
+          </select>
+          <input id="labSearch" type="search" placeholder="搜尋檢驗項目">
+        </div>
+        <div class="table-wrap"><table>
         <thead><tr><th>日期</th><th>項目</th><th>結果</th><th>單位</th></tr></thead>
         <tbody id="labTableBody"></tbody>
       </table></div></article>
@@ -280,6 +295,19 @@
           <button id="clearLabBtn" class="secondary-btn">清空欄位</button>
         </div>
         <p id="saveMsg" class="small"></p>
+      </article>
+    </section>
+
+<section class="page" id="more">
+      <article class="card">
+        <h2>更多功能</h2>
+        <div class="more-grid">
+          <button class="more-card" data-open-page="alerts">🚦<span>異常提醒</span></button>
+          <button class="more-card" data-open-page="lifestyle">🥗<span>健康建議</span></button>
+          <button class="more-card" data-open-page="report">🧾<span>健康報告</span></button>
+          <button class="more-card" data-open-page="labs">🧪<span>全部檢驗</span></button>
+          <button class="more-card" data-open-page="settings">⚙️<span>設定</span></button>
+        </div>
       </article>
     </section>
 

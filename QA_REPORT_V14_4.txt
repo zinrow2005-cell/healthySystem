@@ -1,0 +1,7 @@
+V14.4 QA (final)
+- Main mobile nav count: 5
+- Main mobile nav: ['dashboard', 'weightlog', 'trends', 'add', 'more']
+- More page present: True
+- Weight edit/delete column: True
+- Lab filter present: True
+- Page count: 10
