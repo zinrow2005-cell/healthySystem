@@ -2,7 +2,7 @@ const LAB_SHEET='health_records';
 
 function doGet(e){
   const action=(e&&e.parameter&&e.parameter.action)||'list';
-  if(action==='ping') return json_({ok:true,version:'V14.4'});
+  if(action==='ping') return json_({ok:true,version:'V14.5'});
   if(action==='list') return list_();
   return json_({ok:false,error:'unknown action'});
 }
@@ -34,7 +34,7 @@ function list_(){
   const sh=sheet_(),hs=currentHeaders_(sh),values=sh.getDataRange().getValues();
   if(values.length<2)return json_({ok:true,records:[]});
   const records=values.slice(1).filter(r=>r[0]).map(row=>{
-    const o={};hs.forEach((h,i)=>{let v=row[i];if(v instanceof Date)v=Utilities.formatDate(v,Session.getScriptTimeZone(),'yyyy-MM-dd');o[h]=v});return o
+    const o={};hs.forEach((h,i)=>{let v=row[i];if(v instanceof Date)v=Utilities.formatDate(v,'Asia/Taipei','yyyy-MM-dd');o[h]=v});return o
   });
   return json_({ok:true,records});
 }
@@ -43,7 +43,7 @@ function upsert_(record){
   const sh=sheet_(),hs=currentHeaders_(sh),values=sh.getDataRange().getValues();
   let rowNum=-1;
   for(let i=1;i<values.length;i++){
-    let d=values[i][0];if(d instanceof Date)d=Utilities.formatDate(d,Session.getScriptTimeZone(),'yyyy-MM-dd');
+    let d=values[i][0];if(d instanceof Date)d=Utilities.formatDate(d,'Asia/Taipei','yyyy-MM-dd');
     if(String(d)===String(record.date)){rowNum=i+1;break}
   }
   const clean={};Object.keys(record).forEach(k=>{const v=record[k];if(v!==null&&v!==undefined&&v!=="")clean[k]=v});
@@ -64,7 +64,7 @@ function deleteWeight_(date){
   const widx=hs.indexOf('weight');
   if(widx<0)return json_({ok:false,error:'weight column missing'});
   for(let i=1;i<values.length;i++){
-    let d=values[i][0];if(d instanceof Date)d=Utilities.formatDate(d,Session.getScriptTimeZone(),'yyyy-MM-dd');
+    let d=values[i][0];if(d instanceof Date)d=Utilities.formatDate(d,'Asia/Taipei','yyyy-MM-dd');
     if(String(d)===String(date)){
       sh.getRange(i+1,widx+1).clearContent();
       const row=sh.getRange(i+1,1,1,hs.length).getValues()[0];

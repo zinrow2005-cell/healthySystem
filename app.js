@@ -6,6 +6,23 @@ const $=s=>document.querySelector(s);
 const n=v=>v===null||v===undefined||v===""?null:Number(v);
 const fmt=(v,d=1)=>v===null||v===undefined||Number.isNaN(Number(v))?"—":Number(v).toFixed(d).replace(/\.0$/,"");
 const bmi=w=>w? w/(HEIGHT_M*HEIGHT_M):null;
+const TZ="Asia/Taipei";
+function dateKey(raw){
+  if(!raw) return "";
+  const s=String(raw);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const d=new Date(s);
+  if(Number.isNaN(d.getTime())) return s.slice(0,10);
+  const parts=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d);
+  const o=Object.fromEntries(parts.map(p=>[p.type,p.value]));
+  return `${o.year}-${o.month}-${o.day}`;
+}
+function displayDate(raw, short=false){
+  const k=dateKey(raw);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(k)) return String(raw||"—");
+  const [y,m,d]=k.split("-");
+  return short ? `${m}/${d}` : `${y}/${m}/${d}`;
+}
 const titles={
   dashboard:["健康總覽","長期趨勢優先，不只看單次紅字"],
   weightlog:["體重紀錄","定期記錄體重並自動計算 BMI 與趨勢"],
@@ -20,7 +37,7 @@ const titles={
 };
 
 function sorted(){
-  return [...records].filter(r=>r&&r.date).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  return [...records].filter(r=>r&&r.date).sort((a,b)=>dateKey(a.date).localeCompare(dateKey(b.date)));
 }
 function latest(){
   const s=sorted(); return s[s.length-1]||{};
@@ -43,7 +60,10 @@ function values(field){
   return sorted().filter(r=>n(r[field])!==null).map(r=>n(r[field]));
 }
 function labels(field){
-  return sorted().filter(r=>n(r[field])!==null).map(r=>String(r.date).slice(0,7));
+  return sorted().filter(r=>n(r[field])!==null).map(r=>displayDate(r.date,true));
+}
+function fullLabels(field){
+  return sorted().filter(r=>n(r[field])!==null).map(r=>displayDate(r.date,false));
 }
 function previousValue(field){
   const a=sorted().filter(r=>n(r[field])!==null);
@@ -56,33 +76,100 @@ function latestValue(field){
 
 function drawLine(canvas, vals, labs, opts={}){
   if(!canvas) return;
+  canvas.__chartState={
+    vals:[...vals],
+    labs:[...labs],
+    fullLabels:opts.fullLabels||labs,
+    unit:opts.unit||"",
+    selected:canvas.__chartState?.selected ?? null,
+    hover:null,
+    min:opts.min,
+    max:opts.max
+  };
+  if(!canvas.__interactiveBound){
+    canvas.__interactiveBound=true;
+    canvas.style.touchAction="pan-y";
+    canvas.addEventListener("pointermove",e=>{
+      if(e.pointerType==="touch") return;
+      selectNearestChartPoint(canvas,e,false);
+    });
+    canvas.addEventListener("pointerleave",()=>{
+      if(!canvas.__chartState) return;
+      canvas.__chartState.hover=null;
+      renderInteractiveLine(canvas);
+    });
+    canvas.addEventListener("pointerdown",e=>{
+      selectNearestChartPoint(canvas,e,true);
+    });
+  }
+  renderInteractiveLine(canvas);
+}
+function selectNearestChartPoint(canvas,e,persist){
+  const s=canvas.__chartState;
+  if(!s||!s.vals.length||!s.points?.length) return;
+  const rect=canvas.getBoundingClientRect();
+  const x=e.clientX-rect.left, y=e.clientY-rect.top;
+  let best=0,dist=Infinity;
+  s.points.forEach((p,i)=>{
+    const d=(p.x-x)*(p.x-x)+(p.y-y)*(p.y-y);
+    if(d<dist){dist=d;best=i}
+  });
+  if(persist) s.selected=best;
+  else s.hover=best;
+  renderInteractiveLine(canvas);
+}
+function renderInteractiveLine(canvas){
+  const s=canvas.__chartState;if(!s)return;
   const rect=canvas.getBoundingClientRect();
   const ratio=window.devicePixelRatio||1;
-  const w=Math.max(300,rect.width||600), h=Math.max(190,rect.height||260);
-  canvas.width=w*ratio; canvas.height=h*ratio;
-  const ctx=canvas.getContext("2d"); ctx.scale(ratio,ratio); ctx.clearRect(0,0,w,h);
-  if(!vals.length){ctx.fillStyle="#6b7478";ctx.font="14px sans-serif";ctx.fillText("尚無資料",20,32);return;}
-  const pad={l:48,r:18,t:20,b:42};
-  let min=Math.min(...vals), max=Math.max(...vals);
-  if(opts.min!==undefined) min=Math.min(min,opts.min);
-  if(opts.max!==undefined) max=Math.max(max,opts.max);
+  const w=Math.max(300,rect.width||600),h=Math.max(190,rect.height||260);
+  canvas.width=w*ratio;canvas.height=h*ratio;
+  const ctx=canvas.getContext("2d");ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,w,h);
+  const vals=s.vals,labs=s.labs;
+  if(!vals.length){ctx.fillStyle="#6b7478";ctx.font="14px sans-serif";ctx.fillText("尚無資料",20,32);s.points=[];return}
+  const pad={l:52,r:20,t:24,b:46};
+  let min=Math.min(...vals),max=Math.max(...vals);
+  if(s.min!==undefined)min=Math.min(min,s.min);
+  if(s.max!==undefined)max=Math.max(max,s.max);
   if(max===min){max+=1;min-=1}
   const span=max-min,lo=min-span*.15,hi=max+span*.15;
   ctx.strokeStyle="#d9e1e3";ctx.lineWidth=1;
   for(let i=0;i<4;i++){const y=pad.t+(h-pad.t-pad.b)*i/3;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke()}
   ctx.fillStyle="#6b7478";ctx.font="12px sans-serif";
-  for(let i=0;i<4;i++){const v=hi-(hi-lo)*i/3;const y=pad.t+(h-pad.t-pad.b)*i/3;ctx.fillText(fmt(v,1),4,y+4)}
+  for(let i=0;i<4;i++){const v=hi-(hi-lo)*i/3,y=pad.t+(h-pad.t-pad.b)*i/3;ctx.fillText(fmt(v,1),5,y+4)}
   const xAt=i=>pad.l+(w-pad.l-pad.r)*(vals.length===1?.5:i/(vals.length-1));
   const yAt=v=>pad.t+(hi-v)/(hi-lo)*(h-pad.t-pad.b);
+  s.points=vals.map((v,i)=>({x:xAt(i),y:yAt(v)}));
   ctx.strokeStyle="#0f766e";ctx.lineWidth=3;ctx.lineJoin="round";ctx.lineCap="round";ctx.beginPath();
-  vals.forEach((v,i)=>{const x=xAt(i),y=yAt(v);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
-  ctx.fillStyle="#0f766e";
-  vals.forEach((v,i)=>{ctx.beginPath();ctx.arc(xAt(i),yAt(v),4,0,Math.PI*2);ctx.fill()});
-  ctx.fillStyle="#6b7478";ctx.textAlign="center";
-  labs.forEach((lab,i)=>{if(i===0||i===labs.length-1||labs.length<=5)ctx.fillText(lab,xAt(i),h-14)});
-  ctx.textAlign="left";
-}
+  s.points.forEach((p,i)=>{i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)});ctx.stroke();
 
+  const active=s.hover!==null?s.hover:s.selected;
+  s.points.forEach((p,i)=>{
+    ctx.beginPath();ctx.arc(p.x,p.y,i===active?6:4,0,Math.PI*2);
+    ctx.fillStyle=i===active?"#115e59":"#0f766e";ctx.fill();
+    if(i===active){ctx.strokeStyle="#ffffff";ctx.lineWidth=2;ctx.stroke()}
+  });
+
+  ctx.fillStyle="#6b7478";ctx.font="12px sans-serif";ctx.textAlign="center";
+  labs.forEach((lab,i)=>{if(i===0||i===labs.length-1||labs.length<=6)ctx.fillText(lab,xAt(i),h-16)});
+  ctx.textAlign="left";
+
+  if(active!==null && active>=0 && active<vals.length){
+    const p=s.points[active],date=s.fullLabels[active]||labs[active]||"",value=`${fmt(vals[active],2)}${s.unit?" "+s.unit:""}`;
+    ctx.font="13px sans-serif";
+    const line1=date,line2=value;
+    const tw=Math.max(ctx.measureText(line1).width,ctx.measureText(line2).width)+24,th=54;
+    let tx=p.x+12,ty=p.y-th-10;
+    if(tx+tw>w-8)tx=p.x-tw-12;
+    if(tx<8)tx=8;if(ty<8)ty=p.y+12;
+    ctx.fillStyle="rgba(17,24,39,.92)";
+    ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(tx,ty,tw,th,9);else ctx.rect(tx,ty,tw,th);
+    ctx.fill();
+    ctx.fillStyle="#fff";ctx.font="12px sans-serif";ctx.fillText(line1,tx+12,ty+20);
+    ctx.font="bold 14px sans-serif";ctx.fillText(line2,tx+12,ty+42);
+  }
+}
 function statusFor(field,val){
   if(val===null) return {level:"none",text:"未檢驗"};
   switch(field){
@@ -127,7 +214,7 @@ function renderDashboard(){
     const p=previousValue(f), c=latestValue(f);
     if(!p||!c) return;
     const a=n(p[f]),b=n(c[f]),cls=b<a?"value-down":b>a?"value-up":"value-neutral";
-    changes.push(`<div class="trend"><span>${label}</span><b class="${cls}">${fmt(a,d)} → ${fmt(b,d)}</b><small>${p.date} → ${c.date}</small></div>`);
+    changes.push(`<div class="trend"><span>${label}</span><b class="${cls}">${fmt(a,d)} → ${fmt(b,d)}</b><small>${displayDate(p.date)} → ${displayDate(c.date)}</small></div>`);
   });
   $("#changeList").innerHTML=changes.join("")||"<p>資料不足。</p>";
 
@@ -137,8 +224,8 @@ function renderDashboard(){
     <div><b>腎功能</b><span>持續追蹤 Creatinine、eGFR、BUN 與尿蛋白 / uACR。</span></div>
     <div><b>尿酸</b><span>避免暴飲暴食、脫水與快速減重，配合醫師用藥與追蹤。</span></div>`;
 
-  drawLine($("#chartGlucose"),values("fasting_glucose"),labels("fasting_glucose"));
-  drawLine($("#chartKidney"),values("creatinine"),labels("creatinine"));
+  drawLine($("#chartGlucose"),values("fasting_glucose"),labels("fasting_glucose"),{fullLabels:fullLabels("fasting_glucose"),unit:"mg/dL"});
+  drawLine($("#chartKidney"),values("creatinine"),labels("creatinine"),{fullLabels:fullLabels("creatinine"),unit:"mg/dL"});
 }
 
 function renderTrends(){
@@ -151,7 +238,7 @@ function renderTrends(){
     ["trendWeight","weight","trendWeightText","kg"]
   ];
   configs.forEach(([cid,f,tid,unit])=>{
-    const vals=values(f); drawLine($("#"+cid),vals,labels(f));
+    const vals=values(f); drawLine($("#"+cid),vals,labels(f),{fullLabels:fullLabels(f),unit});
     if(vals.length>=2){
       const a=vals[vals.length-2],b=vals[vals.length-1];
       $("#"+tid).innerHTML=`<p>最近：${fmt(a,2)} → ${fmt(b,2)} ${unit}，${b<a?"下降":b>a?"上升":"持平"}。</p>`;
@@ -216,15 +303,15 @@ function renderLifestyle(){
 }
 
 function weightRows(){
-  return sorted().filter(r=>n(r.weight)!==null).map(r=>({date:r.date,weight:n(r.weight)}));
+  return sorted().filter(r=>n(r.weight)!==null).map(r=>({date:dateKey(r.date),weight:n(r.weight)}));
 }
 function renderWeightLog(){
   const rows=weightRows(), rev=[...rows].reverse();
   $("#weightLogBody").innerHTML=rev.map((r,idx)=>{
     const prev=rev[idx+1],d=prev?r.weight-prev.weight:null,cls=d===null?"delta-neutral":d<0?"delta-good":d>0?"delta-watch":"delta-neutral";
-    return `<tr><td>${r.date}</td><td>${fmt(r.weight,1)} kg</td><td>${fmt(bmi(r.weight),1)}</td><td class="${cls}">${d===null?"—":`${d>0?"+":""}${fmt(d,1)} kg`}</td><td><div class="table-action"><button class="edit-weight" data-date="${r.date}">編輯</button><button class="delete-weight" data-date="${r.date}">刪除</button></div></td></tr>`;
+    return `<tr><td>${displayDate(r.date)}</td><td>${fmt(r.weight,1)} kg</td><td>${fmt(bmi(r.weight),1)}</td><td class="${cls}">${d===null?"—":`${d>0?"+":""}${fmt(d,1)} kg`}</td><td><div class="table-action"><button class="edit-weight" data-date="${dateKey(r.date)}">編輯</button><button class="delete-weight" data-date="${dateKey(r.date)}">刪除</button></div></td></tr>`;
   }).join("")||`<tr><td colspan="5">尚無體重紀錄</td></tr>`;
-  drawLine($("#weightLogChart"),rows.map(x=>x.weight),rows.map(x=>x.date.slice(5)));
+  drawLine($("#weightLogChart"),rows.map(x=>x.weight),rows.map(x=>displayDate(x.date,true)),{fullLabels:rows.map(x=>displayDate(x.date,false)),unit:"kg"});
   if(rows.length){
     const first=rows[0],last=rows[rows.length-1],diff=last.weight-first.weight;
     $("#weightSummary").innerHTML=`<div class="weight-kpi">
@@ -232,7 +319,7 @@ function renderWeightLog(){
       <div><span>BMI</span><b>${fmt(bmi(last.weight),1)}</b></div>
       <div><span>累積變化</span><b class="${diff<0?"delta-good":diff>0?"delta-watch":"delta-neutral"}">${diff>0?"+":""}${fmt(diff,1)} kg</b></div>
     </div>`;
-    $("#weightTrendText").innerHTML=`<p>從 ${first.date} 到 ${last.date}，體重 ${diff<0?"下降":diff>0?"上升":"持平"} ${fmt(Math.abs(diff),1)} kg。</p>`;
+    $("#weightTrendText").innerHTML=`<p>從 ${displayDate(first.date)} 到 ${displayDate(last.date)}，體重 ${diff<0?"下降":diff>0?"上升":"持平"} ${fmt(Math.abs(diff),1)} kg。</p>`;
   }else{
     $("#weightSummary").innerHTML="<p>尚無體重紀錄。</p>";$("#weightTrendText").innerHTML="<p>開始記錄後，這裡會顯示體重變化。</p>";
   }
@@ -251,14 +338,14 @@ const LAB_META={
 function renderLabs(){
   const rows=[];
   sorted().slice().reverse().forEach(r=>{
-    Object.entries(LAB_META).forEach(([k,m])=>{if(n(r[k])!==null)rows.push(`<tr><td>${r.date}</td><td>${m[0]}</td><td>${fmt(n(r[k]),m[2])}</td><td>${m[1]}</td></tr>`)});
+    Object.entries(LAB_META).forEach(([k,m])=>{if(n(r[k])!==null)rows.push(`<tr><td>${displayDate(r.date)}</td><td>${m[0]}</td><td>${fmt(n(r[k]),m[2])}</td><td>${m[1]}</td></tr>`)});
   });
   $("#labTableBody").innerHTML=rows.join("")||`<tr><td colspan="4">尚無資料</td></tr>`;
 }
 
 function renderReport(){
   const l=latestLabRecord();
-  $("#reportDate").textContent=l.date?`最近一次資料：${l.date}`:"尚無資料";
+  $("#reportDate").textContent=l.date?`最近一次資料：${displayDate(l.date)}`:"尚無資料";
   const improved=[],watch=[],stable=[],table=[];
   Object.entries(LAB_META).forEach(([f,m])=>{
     const c=latestValue(f); if(!c)return;
@@ -321,18 +408,19 @@ async function apiPost(payload){
 async function loadData(){
   const api=localStorage.getItem("healthApiUrl")||"";$("#apiUrl").value=api;
   const local=JSON.parse(localStorage.getItem("healthLocalData")||JSON.stringify(SAMPLE_DATA));
-  if(!api){records=local;$("#syncStatus").textContent="本機資料";renderAll();return;}
+  if(!api){records=local.map(r=>({...r,date:dateKey(r.date)}));$("#syncStatus").textContent="本機資料";renderAll();return;}
   try{
     $("#syncStatus").textContent="同步中…";
     const d=await apiGet("list");
-    records=Array.isArray(d.records)?d.records:local;
+    records=(Array.isArray(d.records)?d.records:local).map(r=>({...r,date:dateKey(r.date)}));
     $("#syncStatus").textContent="Google Sheet 已同步";
   }catch(e){
-    records=local;$("#syncStatus").textContent="同步失敗・使用本機資料";
+    records=local.map(r=>({...r,date:dateKey(r.date)}));$("#syncStatus").textContent="同步失敗・使用本機資料";
   }
   renderAll();
 }
 async function saveRecord(record,msgEl){
+  if(record.date) record.date=dateKey(record.date);
   const api=localStorage.getItem("healthApiUrl")||"";
   if(api){
     try{await apiPost({action:"upsert",record});if(msgEl)msgEl.textContent="已儲存到 Google Sheet。";await loadData();return true}
@@ -342,7 +430,7 @@ async function saveRecord(record,msgEl){
   const idx=local.findIndex(x=>x.date===record.date);
   if(idx>=0)local[idx]={...local[idx],...Object.fromEntries(Object.entries(record).filter(([,v])=>v!==null&&v!==""))};
   else local.push(record);
-  localStorage.setItem("healthLocalData",JSON.stringify(local));records=local;renderAll();
+  localStorage.setItem("healthLocalData",JSON.stringify(local));records=local.map(r=>({...r,date:dateKey(r.date)}));renderAll();
   if(msgEl)msgEl.textContent="已儲存在此裝置。";return false;
 }
 async function saveWeight(){
@@ -407,7 +495,7 @@ if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(
 loadData();
 
 async function deleteWeightRecord(date){
-  if(!confirm(`確定刪除 ${date} 的體重紀錄嗎？`)) return;
+  if(!confirm(`確定刪除 ${displayDate(date)} 的體重紀錄嗎？`)) return;
   const api=localStorage.getItem("healthApiUrl")||"";
   if(api){
     try{
@@ -416,17 +504,17 @@ async function deleteWeightRecord(date){
     }catch(e){ alert("雲端刪除失敗："+e.message); return; }
   }
   const local=JSON.parse(localStorage.getItem("healthLocalData")||"[]");
-  const idx=local.findIndex(x=>x.date===date);
+  const idx=local.findIndex(x=>dateKey(x.date)===dateKey(date));
   if(idx>=0){
     local[idx].weight=null;
     if(Object.entries(local[idx]).filter(([k,v])=>k!=="date"&&v!==null&&v!==""&&v!==undefined).length===0) local.splice(idx,1);
   }
-  localStorage.setItem("healthLocalData",JSON.stringify(local));records=local;renderAll();
+  localStorage.setItem("healthLocalData",JSON.stringify(local));records=local.map(r=>({...r,date:dateKey(r.date)}));renderAll();
 }
 function editWeightRecord(date){
-  const r=sorted().find(x=>x.date===date);
+  const r=sorted().find(x=>dateKey(x.date)===dateKey(date));
   if(!r) return;
-  $("#wtDate").value=date;
+  $("#wtDate").value=dateKey(date);
   $("#wtWeight").value=n(r.weight)??"";
   setPage("weightlog");
   $("#wtWeight").focus();
@@ -473,7 +561,7 @@ renderLabs=function(){
     fields.forEach(k=>{
       const m=LAB_META[k]; if(!m||n(r[k])===null)return;
       if(q && !m[0].toLowerCase().includes(q)) return;
-      rows.push(`<tr><td>${r.date}</td><td>${m[0]}</td><td>${fmt(n(r[k]),m[2])}</td><td>${m[1]}</td></tr>`);
+      rows.push(`<tr><td>${displayDate(r.date)}</td><td>${m[0]}</td><td>${fmt(n(r[k]),m[2])}</td><td>${m[1]}</td></tr>`);
     });
   });
   $("#labTableBody").innerHTML=rows.join("")||`<tr><td colspan="4">沒有符合條件的資料</td></tr>`;

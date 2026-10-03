@@ -216,3 +216,7 @@ th{background:#f1f6f5}
   .filter-row{display:grid;grid-template-columns:1fr}
   .filter-row select,.filter-row input{width:100%;font-size:16px}
 }
+
+/* V14.5 interactive charts */
+.chart-wrap canvas{cursor:crosshair;touch-action:pan-y}
+@media (max-width:700px){.chart-wrap canvas{cursor:default}}
