@@ -1,0 +1,511 @@
+{
+  "version": "16.1",
+  "purpose": "Expanded multi-marker pattern definitions for longitudinal decision support.",
+  "systems": [
+    {
+      "id": "kidney_integrated",
+      "label": "腎臟整合",
+      "markers": [
+        "creatinine",
+        "egfr",
+        "bun",
+        "uacr",
+        "urine_protein",
+        "urine_blood",
+        "systolic_bp",
+        "diastolic_bp",
+        "potassium"
+      ],
+      "patterns": [
+        {
+          "id": "kidney_concordant_worsening",
+          "level": "priority",
+          "title": "多項腎臟相關指標呈一致惡化方向"
+        },
+        {
+          "id": "kidney_isolated_fluctuation",
+          "level": "watch",
+          "title": "目前較像單一腎功能指標波動"
+        },
+        {
+          "id": "kidney_bp_cluster",
+          "level": "priority",
+          "title": "腎臟指標與血壓同時需要追蹤"
+        },
+        {
+          "id": "kidney_albuminuria_without_low_egfr",
+          "level": "watch",
+          "title": "eGFR 尚可但尿白蛋白／蛋白尿異常"
+        },
+        {
+          "id": "kidney_persistent_low_egfr",
+          "level": "priority",
+          "title": "eGFR 持續偏低"
+        },
+        {
+          "id": "kidney_potassium_cluster",
+          "level": "priority",
+          "title": "腎功能異常合併鉀離子異常"
+        }
+      ]
+    },
+    {
+      "id": "metabolic",
+      "label": "糖代謝 / 心血管代謝",
+      "markers": [
+        "fasting_glucose",
+        "hba1c",
+        "weight",
+        "systolic_bp",
+        "diastolic_bp",
+        "triglycerides",
+        "ldl",
+        "hdl"
+      ],
+      "patterns": [
+        {
+          "id": "metabolic_cluster",
+          "level": "priority",
+          "title": "多個代謝風險因子集中"
+        },
+        {
+          "id": "glycemia_discordance",
+          "level": "watch",
+          "title": "空腹血糖與 HbA1c 方向不完全一致"
+        },
+        {
+          "id": "metabolic_improving",
+          "level": "stable",
+          "title": "多項代謝指標呈改善方向"
+        },
+        {
+          "id": "glycemia_concordant_worsening",
+          "level": "priority",
+          "title": "空腹血糖與 HbA1c 同時惡化"
+        },
+        {
+          "id": "weight_glucose_link",
+          "level": "watch",
+          "title": "體重與血糖呈同方向惡化"
+        }
+      ]
+    },
+    {
+      "id": "liver_metabolic",
+      "label": "肝膽 / 代謝",
+      "markers": [
+        "alt",
+        "ast",
+        "ggt",
+        "alp",
+        "bilirubin_total",
+        "bilirubin_direct",
+        "albumin",
+        "triglycerides",
+        "weight",
+        "fasting_glucose"
+      ],
+      "patterns": [
+        {
+          "id": "liver_metabolic_cluster",
+          "level": "watch",
+          "title": "肝酵素與代謝指標同時偏離"
+        },
+        {
+          "id": "hepatocellular_pattern",
+          "level": "priority",
+          "title": "轉胺酶為主的肝細胞型異常方向"
+        },
+        {
+          "id": "cholestatic_pattern",
+          "level": "priority",
+          "title": "ALP / GGT 為主的膽汁鬱積型異常方向"
+        },
+        {
+          "id": "bilirubin_pattern",
+          "level": "watch",
+          "title": "膽紅素異常需要進一步分型"
+        },
+        {
+          "id": "liver_synthetic_signal",
+          "level": "priority",
+          "title": "白蛋白下降合併其他肝功能異常"
+        }
+      ]
+    },
+    {
+      "id": "iron_anemia",
+      "label": "貧血 / 鐵代謝",
+      "markers": [
+        "hb",
+        "hct",
+        "mcv",
+        "mch",
+        "rdw",
+        "ferritin",
+        "iron",
+        "tibc",
+        "transferrin",
+        "transferrin_saturation",
+        "vitamin_b12",
+        "folate"
+      ],
+      "patterns": [
+        {
+          "id": "microcytic_iron_pattern",
+          "level": "priority",
+          "title": "小球性貧血合併缺鐵方向"
+        },
+        {
+          "id": "macrocytic_pattern",
+          "level": "watch",
+          "title": "血紅素下降且 MCV 偏高"
+        },
+        {
+          "id": "normocytic_anemia_pattern",
+          "level": "watch",
+          "title": "正球性貧血方向"
+        },
+        {
+          "id": "iron_depletion_without_anemia",
+          "level": "watch",
+          "title": "鐵儲存下降但血紅素尚未明顯下降"
+        },
+        {
+          "id": "b12_folate_pattern",
+          "level": "priority",
+          "title": "巨球性變化合併 B12 / 葉酸不足方向"
+        }
+      ]
+    },
+    {
+      "id": "thyroid",
+      "label": "甲狀腺",
+      "markers": [
+        "tsh",
+        "free_t4",
+        "free_t3",
+        "anti_tpo",
+        "anti_tg"
+      ],
+      "patterns": [
+        {
+          "id": "tsh_high_ft4_low",
+          "level": "priority",
+          "title": "TSH 高、Free T4 低的甲狀腺低功能方向"
+        },
+        {
+          "id": "tsh_low_ft4_high",
+          "level": "priority",
+          "title": "TSH 低、Free T4 高的甲狀腺高功能方向"
+        },
+        {
+          "id": "subclinical_hypothyroid_pattern",
+          "level": "watch",
+          "title": "TSH 高但 Free T4 尚在參考範圍"
+        },
+        {
+          "id": "subclinical_hyperthyroid_pattern",
+          "level": "watch",
+          "title": "TSH 低但 Free T4 尚在參考範圍"
+        },
+        {
+          "id": "thyroid_autoimmune_signal",
+          "level": "watch",
+          "title": "甲狀腺自體抗體異常訊號"
+        }
+      ]
+    },
+    {
+      "id": "inflammation",
+      "label": "發炎 / 感染訊號",
+      "markers": [
+        "crp",
+        "hs_crp",
+        "wbc",
+        "neutrophils",
+        "procalcitonin",
+        "esr"
+      ],
+      "patterns": [
+        {
+          "id": "inflammation_concordant",
+          "level": "priority",
+          "title": "多項發炎相關指標同步升高"
+        },
+        {
+          "id": "isolated_crp_signal",
+          "level": "watch",
+          "title": "單一 CRP / hs-CRP 升高"
+        },
+        {
+          "id": "wbc_neutrophil_pattern",
+          "level": "watch",
+          "title": "白血球與嗜中性球同時升高"
+        },
+        {
+          "id": "inflammation_resolving",
+          "level": "stable",
+          "title": "多項發炎指標同步下降"
+        }
+      ]
+    },
+    {
+      "id": "electrolyte_renal",
+      "label": "電解質 / 腎功能",
+      "markers": [
+        "sodium",
+        "potassium",
+        "chloride",
+        "bicarbonate",
+        "calcium",
+        "magnesium",
+        "phosphorus",
+        "creatinine",
+        "egfr"
+      ],
+      "patterns": [
+        {
+          "id": "potassium_kidney",
+          "level": "priority",
+          "title": "鉀離子異常合併腎功能異常"
+        },
+        {
+          "id": "sodium_abnormal_pattern",
+          "level": "priority",
+          "title": "鈉離子明顯異常"
+        },
+        {
+          "id": "bicarbonate_renal_pattern",
+          "level": "watch",
+          "title": "碳酸氫根異常合併腎功能變化"
+        },
+        {
+          "id": "calcium_magnesium_pattern",
+          "level": "watch",
+          "title": "鈣 / 鎂同時異常"
+        }
+      ]
+    },
+    {
+      "id": "lipid_cardiometabolic",
+      "label": "血脂 / 心血管代謝",
+      "markers": [
+        "ldl",
+        "triglycerides",
+        "hdl",
+        "non_hdl",
+        "apob",
+        "lpa",
+        "fasting_glucose",
+        "hba1c",
+        "weight",
+        "systolic_bp",
+        "diastolic_bp"
+      ],
+      "patterns": [
+        {
+          "id": "atherogenic_cluster",
+          "level": "priority",
+          "title": "多個動脈粥樣硬化相關風險指標集中"
+        },
+        {
+          "id": "ldl_apob_discordance",
+          "level": "watch",
+          "title": "LDL-C 與 ApoB 訊號不一致"
+        },
+        {
+          "id": "tg_hdl_pattern",
+          "level": "watch",
+          "title": "TG 偏高合併 HDL 偏低方向"
+        },
+        {
+          "id": "lipid_improving",
+          "level": "stable",
+          "title": "多項血脂指標同步改善"
+        }
+      ]
+    },
+    {
+      "id": "uric_kidney",
+      "label": "尿酸 / 腎臟",
+      "markers": [
+        "uric_acid",
+        "creatinine",
+        "egfr",
+        "uacr"
+      ],
+      "patterns": [
+        {
+          "id": "uric_kidney_cluster",
+          "level": "watch",
+          "title": "尿酸偏高且腎功能同時需要追蹤"
+        },
+        {
+          "id": "uric_improving_kidney_stable",
+          "level": "stable",
+          "title": "尿酸改善且腎功能相對穩定"
+        }
+      ]
+    },
+    {
+      "id": "pancreas",
+      "label": "胰臟酵素",
+      "markers": [
+        "lipase",
+        "amylase",
+        "glucose"
+      ],
+      "patterns": [
+        {
+          "id": "pancreatic_enzymes_high",
+          "level": "priority",
+          "title": "胰臟酵素同時高於檢驗單參考範圍"
+        },
+        {
+          "id": "isolated_lipase_high",
+          "level": "watch",
+          "title": "Lipase 單獨升高"
+        }
+      ]
+    },
+    {
+      "id": "bone_mineral",
+      "label": "骨骼 / 礦物質",
+      "markers": [
+        "calcium",
+        "phosphorus",
+        "vitamin_d",
+        "pth",
+        "albumin"
+      ],
+      "patterns": [
+        {
+          "id": "vitd_low_pattern",
+          "level": "watch",
+          "title": "Vitamin D 低於檢驗單參考範圍"
+        },
+        {
+          "id": "pth_calcium_pattern",
+          "level": "priority",
+          "title": "PTH 與鈣異常的組合訊號"
+        },
+        {
+          "id": "calcium_phosphate_pattern",
+          "level": "watch",
+          "title": "鈣磷同時異常"
+        }
+      ]
+    },
+    {
+      "id": "coagulation",
+      "label": "凝血",
+      "markers": [
+        "pt",
+        "inr",
+        "ptt",
+        "fibrinogen",
+        "d_dimer",
+        "plt"
+      ],
+      "patterns": [
+        {
+          "id": "coag_multiple_abnormal",
+          "level": "priority",
+          "title": "多項凝血指標同時異常"
+        },
+        {
+          "id": "platelet_coag_cluster",
+          "level": "priority",
+          "title": "血小板與凝血指標同時異常"
+        },
+        {
+          "id": "isolated_d_dimer",
+          "level": "watch",
+          "title": "D-Dimer 單獨升高需結合臨床背景"
+        }
+      ]
+    },
+    {
+      "id": "urinalysis",
+      "label": "尿液分析",
+      "markers": [
+        "urine_protein",
+        "urine_blood",
+        "urine_rbc",
+        "urine_wbc",
+        "urine_leukocyte",
+        "urine_nitrite",
+        "uacr"
+      ],
+      "patterns": [
+        {
+          "id": "protein_blood_cluster",
+          "level": "priority",
+          "title": "尿蛋白與尿潛血 / 尿紅血球同時異常"
+        },
+        {
+          "id": "pyuria_nitrite_pattern",
+          "level": "watch",
+          "title": "尿白血球 / 白血球酯酶合併亞硝酸鹽異常"
+        },
+        {
+          "id": "isolated_hematuria_signal",
+          "level": "watch",
+          "title": "單獨血尿訊號需持續確認"
+        }
+      ]
+    },
+    {
+      "id": "cardiac_markers",
+      "label": "心肌損傷標記",
+      "markers": [
+        "troponin_i",
+        "troponin_t",
+        "ck_mb",
+        "bnp",
+        "nt_probnp"
+      ],
+      "patterns": [
+        {
+          "id": "troponin_high",
+          "level": "priority",
+          "title": "Troponin 高於檢驗單參考範圍"
+        },
+        {
+          "id": "natriuretic_peptide_high",
+          "level": "priority",
+          "title": "BNP / NT-proBNP 高於檢驗單參考範圍"
+        },
+        {
+          "id": "multi_cardiac_marker",
+          "level": "priority",
+          "title": "多項心臟相關標記同時異常"
+        }
+      ]
+    },
+    {
+      "id": "nutrition_protein",
+      "label": "營養 / 蛋白狀態",
+      "markers": [
+        "albumin",
+        "prealbumin",
+        "total_protein",
+        "weight",
+        "crp"
+      ],
+      "patterns": [
+        {
+          "id": "albumin_prealbumin_low",
+          "level": "watch",
+          "title": "Albumin / Prealbumin 下降"
+        },
+        {
+          "id": "protein_inflammation_context",
+          "level": "watch",
+          "title": "低蛋白指標合併發炎訊號"
+        }
+      ]
+    }
+  ]
+}

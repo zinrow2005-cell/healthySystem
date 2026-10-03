@@ -1,0 +1,111 @@
+{
+  "version": "15.3",
+  "policy": {
+    "unknown_test_behavior": "Store first, analyze conservatively.",
+    "reference_priority": [
+      "User/laboratory reference range",
+      "Dedicated rule in health intelligence database",
+      "Generic screening range if available",
+      "Otherwise store without clinical interpretation"
+    ],
+    "safety": [
+      "Do not diagnose from an unknown test.",
+      "Do not infer a reference range when none is provided.",
+      "Do not recommend medication changes from an unknown test."
+    ]
+  },
+  "known_examples": {
+    "ferritin": {
+      "aliases": [
+        "Ferritin",
+        "鐵蛋白"
+      ],
+      "unit_hint": "ng/mL"
+    },
+    "vitamin_d": {
+      "aliases": [
+        "25-OH Vitamin D",
+        "Vitamin D",
+        "維生素D"
+      ],
+      "unit_hint": "ng/mL"
+    },
+    "tsh": {
+      "aliases": [
+        "TSH",
+        "促甲狀腺激素"
+      ],
+      "unit_hint": "mIU/L"
+    },
+    "free_t4": {
+      "aliases": [
+        "Free T4",
+        "FT4"
+      ],
+      "unit_hint": "ng/dL"
+    },
+    "psa": {
+      "aliases": [
+        "PSA",
+        "前列腺特異抗原"
+      ],
+      "unit_hint": "ng/mL"
+    },
+    "crp": {
+      "aliases": [
+        "CRP",
+        "C-reactive protein"
+      ],
+      "unit_hint": "mg/L"
+    },
+    "hs_crp": {
+      "aliases": [
+        "hs-CRP",
+        "高敏感度CRP"
+      ],
+      "unit_hint": "mg/L"
+    },
+    "ck": {
+      "aliases": [
+        "CK",
+        "CPK"
+      ],
+      "unit_hint": "U/L"
+    },
+    "amylase": {
+      "aliases": [
+        "Amylase",
+        "澱粉酶"
+      ],
+      "unit_hint": "U/L"
+    },
+    "lipase": {
+      "aliases": [
+        "Lipase",
+        "脂肪酶"
+      ],
+      "unit_hint": "U/L"
+    },
+    "apob": {
+      "aliases": [
+        "ApoB",
+        "Apolipoprotein B"
+      ],
+      "unit_hint": "mg/dL"
+    },
+    "lpa": {
+      "aliases": [
+        "Lp(a)",
+        "Lipoprotein(a)"
+      ],
+      "unit_hint": "mg/dL"
+    },
+    "cystatin_c": {
+      "aliases": [
+        "Cystatin C",
+        "胱蛋白酶抑制劑C"
+      ],
+      "unit_hint": "mg/L"
+    }
+  }
+}

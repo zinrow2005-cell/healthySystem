@@ -7,16 +7,17 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="健康監測">
-  <title>健康監測 V15.1</title>
+  <title>健康監測 V16.2</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div id="offlineBanner" class="offline-banner" hidden>目前離線：可查看已快取內容；雲端同步會在恢復連線後再進行。</div>
 <div class="app">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-mark">❤</div>
-      <div><div class="brand-title">健康監測</div><div class="brand-sub">V15.1 Rule QA + Reference Ranges</div></div>
+      <div><div class="brand-title">健康監測</div><div class="brand-sub">V16.2 Production Readiness</div></div>
     </div>
     <nav>
       <button class="nav-btn active" data-page="dashboard">🏠 <span>健康總覽</span></button>
@@ -27,7 +28,7 @@
       <button class="nav-btn secondary-nav" data-page="lifestyle">🥗 <span>健康建議</span></button>
       <button class="nav-btn secondary-nav" data-page="report">🧾 <span>健康報告</span></button>
       <button class="nav-btn secondary-nav" data-page="labs">📋 <span>全部檢驗</span></button>
-      <button class="nav-btn" data-page="add">➕ <span>新增</span></button>
+      <button class="nav-btn" data-page="add">➕ <span>新增檢驗</span></button>
       <button class="nav-btn more-nav" data-page="more">••• <span>更多</span></button>
       <button class="nav-btn secondary-nav" data-page="settings">⚙️ <span>資料連線</span></button>
     </nav>
@@ -106,8 +107,8 @@
 
       <article class="card">
         <h2>體重紀錄</h2>
-        <div id="labGroupedList" class="lab-grouped-list"></div>
-        <div class="table-wrap lab-table-fallback">
+        <p class="small">這裡只顯示體重資料；檢驗數據請到「全部檢驗」。</p>
+        <div class="table-wrap">
           <table>
             <thead><tr><th>日期</th><th>體重</th><th>BMI</th><th>與前次差異</th><th>操作</th></tr></thead>
             <tbody id="weightLogBody"></tbody>
@@ -146,6 +147,7 @@
     </section>
 
     
+    
     <section class="page" id="intelligence">
       <article class="card">
         <div class="card-head-row">
@@ -166,6 +168,28 @@
         <h2>分析與建議</h2>
         <div id="intelligenceFindings" class="intel-findings"></div>
       </article>
+
+      <article class="card">
+        <div class="card-head-row">
+          <div>
+            <h2>多指標聯合深度解讀</h2>
+            <p class="small">不只看單一紅字。系統會把同一器官系統與跨系統的數值、前後變化、持續性、參考範圍與方向一致性一起判斷。</p>
+          </div>
+          <div id="patternEngineStats" class="pattern-stats"></div>
+        </div>
+        <div id="patternSummary" class="pattern-summary-grid"></div>
+      </article>
+
+      <article class="card">
+        <h2>聯合判讀結果</h2>
+        <div id="patternFindings" class="pattern-findings"></div>
+      </article>
+
+      <article class="card">
+        <h2>資料缺口與下一次可補強項目</h2>
+        <div id="patternDataGaps" class="pattern-gaps"></div>
+      </article>
+
 
       <article class="card">
         <div class="card-head-row">
@@ -328,15 +352,31 @@
           </select>
           <input id="labSearch" type="search" placeholder="搜尋檢驗項目">
         </div>
-        <div class="table-wrap"><table>
-        <thead><tr><th>日期</th><th>項目</th><th>結果</th><th>單位</th></tr></thead>
-        <tbody id="labTableBody"></tbody>
-      </table></div></article>
+        <div id="labGroupedList" class="lab-grouped-list"></div>
+        <div class="table-wrap lab-table-fallback"><table>
+          <thead><tr><th>日期</th><th>項目</th><th>結果</th><th>單位</th></tr></thead>
+          <tbody id="labTableBody"></tbody>
+        </table></div>
+      </article>
     </section>
 
     
     <section class="page" id="add">
-      <article class="card">
+
+      <article class="card unified-entry-head">
+        <div>
+          <h2>新增檢驗</h2>
+          <p class="small">同一個入口處理「常用整批檢驗」與「資料庫／未知檢驗」。資料會依類型自動存到適合的位置。</p>
+        </div>
+        <div class="entry-mode-switch" id="entryModeSwitch">
+          <button type="button" data-entry-mode="batch" class="active">常用整批</button>
+          <button type="button" data-entry-mode="catalog">搜尋／單項新增</button>
+          <button type="button" data-entry-mode="manage">自訂檢驗紀錄</button>
+        </div>
+      </article>
+
+      <div class="entry-mode-panel active" data-entry-panel="batch">
+<article class="card">
         <h2>新增完整檢驗</h2>
         <p class="small">只填這次有驗的項目即可，留白不會當成 0。</p>
 
@@ -409,8 +449,95 @@
         </div>
         <p id="saveMsg" class="small"></p>
       </article>
-    </section>
+      </div>
 
+      <div class="entry-mode-panel" data-entry-panel="catalog">
+<div class="grid two">
+        <article class="card">
+          <h2>新增單項檢驗</h2>
+          <p class="small">先搜尋資料庫項目；找不到時直接輸入檢驗名稱即可。若有檢驗單參考範圍，建議一併輸入。</p>
+          <div class="form-grid">
+            <label>日期<input id="customLabDate" type="date"></label>
+            <label>檢驗名稱<input id="customLabName" type="text" placeholder="例如 Ferritin / TSH / ApoB"></label>
+            <label>檢驗代碼<input id="customLabCode" type="text" placeholder="可留白，例如 ferritin"></label>
+            <label>LOINC code（選填）<input id="customLabLoinc" type="text" placeholder="例如醫院報告或資料交換代碼"></label>
+            <label>數值<input id="customLabValue" type="number" step="any" inputmode="decimal"></label>
+            <label>單位<input id="customLabUnit" type="text" placeholder="例如 ng/mL"></label>
+            <label>參考下限<input id="customLabLow" type="number" step="any" inputmode="decimal"></label>
+            <label>參考上限<input id="customLabHigh" type="number" step="any" inputmode="decimal"></label>
+            <label>參考文字<input id="customLabRefText" type="text" placeholder="例如 <90、陰性、30–100"></label>
+          </div>
+          <label class="full-label">備註<textarea id="customLabNote" rows="3" placeholder="檢驗單備註、檢驗目的、其他說明"></textarea></label>
+          <div class="form-actions">
+            <button id="saveCustomLabBtn" class="primary-btn" type="button">儲存自訂檢驗</button>
+            <button id="clearCustomLabBtn" class="secondary-btn" type="button">清空</button>
+          </div>
+          <p id="customLabMsg" class="small"></p>
+        </article>
+
+        <article class="card">
+          <h2>自訂檢驗判讀原則</h2>
+          <div class="advice-list">
+            <div class="advice-item">有輸入檢驗單參考範圍：系統可先判斷是否低於 / 高於範圍。</div>
+            <div class="advice-item">沒有參考範圍：只保存資料，不自行猜測正常值。</div>
+            <div class="advice-item">尚未建立專屬規則：只做保守提醒，不下診斷。</div>
+            <div class="advice-item">日後規則庫加入該檢驗後，舊資料也可重新分析。</div>
+          </div>
+          <div id="customLabPreview" class="custom-lab-preview"></div>
+        </article>
+      </div>
+
+
+      <article class="card">
+        <div class="card-head-row">
+          <div>
+            <h2>檢驗項目資料庫</h2>
+            <p class="small">先從資料庫搜尋常見檢驗；找不到仍可直接建立自訂項目。資料庫只負責辨識與單位提示，不會自動猜正常值。</p>
+          </div>
+          <div class="catalog-stats" id="catalogStats"></div>
+        </div>
+        <div class="catalog-toolbar">
+          <input id="labCatalogSearch" type="search" placeholder="搜尋中文、英文、縮寫，例如 TSH、Ferritin、LDL">
+          <select id="labCatalogCategory"><option value="all">全部分類</option></select>
+        </div>
+        <div id="labCatalogResults" class="lab-catalog-results"></div>
+      </article>
+
+      <article class="card">
+        <div class="card-head-row">
+          <div>
+            <h2>自訂檢驗趨勢</h2>
+            <p class="small">選一個自訂檢驗，即可查看歷次數值、參考區間與變化方向。</p>
+          </div>
+          <select id="customLabTrendSelect"></select>
+        </div>
+        <div class="chart-wrap"><canvas id="customLabTrendChart"></canvas></div>
+        <div id="customLabTrendSummary" class="custom-trend-summary"></div>
+      </article>
+
+      <article class="card">
+        <div class="card-head-row">
+          <div>
+            <h2>自訂檢驗紀錄</h2>
+            <p class="small">這裡專門保存系統原本沒有的檢驗項目，與核心 health_records 分開管理。</p>
+          </div>
+          <input id="customLabSearch" type="search" placeholder="搜尋檢驗名稱">
+        </div>
+        <div id="customLabList" class="custom-lab-list"></div>
+      </article>
+
+      <article class="card">
+        <div class="card-head-row">
+          <div>
+            <h2>規則升級候選</h2>
+            <p class="small">累積多次紀錄但尚未有專屬規則的檢驗，會列在這裡，方便之後加入智慧分析資料庫。</p>
+          </div>
+        </div>
+        <div id="unsupportedLabList" class="unsupported-lab-list"></div>
+      </article>
+      </div>
+
+    </section>
 <section class="page" id="more">
       <article class="card">
         <h2>更多功能</h2>
@@ -437,6 +564,42 @@
         <p id="apiMsg" class="small"></p>
           <div id="syncDiagnostics" class="diagnostic-grid"></div>
       </article>
+
+      <article class="card">
+        <div class="card-head-row">
+          <div>
+            <h2>正式使用檢查中心</h2>
+            <p class="small">正式長期使用前，可一次檢查資料、Google Sheet、PWA、重複資料與備份狀態。</p>
+          </div>
+          <button id="runProductionCheckBtn" class="primary-btn" type="button">執行完整檢查</button>
+        </div>
+        <div id="productionCheckSummary" class="production-check-summary"></div>
+        <div id="productionCheckList" class="production-check-list"></div>
+      </article>
+
+      <article class="card">
+        <h2>資料備份與攜出</h2>
+        <p class="small">建議固定備份。JSON 可保留完整欄位；CSV 適合用試算表查看。</p>
+        <div class="form-actions">
+          <button id="exportJsonBtn" class="secondary-btn" type="button">匯出完整 JSON</button>
+          <button id="exportCoreCsvBtn" class="secondary-btn" type="button">匯出核心檢驗 CSV</button>
+          <button id="exportCustomCsvBtn" class="secondary-btn" type="button">匯出自訂檢驗 CSV</button>
+        </div>
+        <div class="import-box">
+          <label class="full-label">從本系統 JSON 備份還原到本機
+            <input id="importJsonFile" type="file" accept=".json,application/json">
+          </label>
+          <button id="importJsonBtn" class="secondary-btn" type="button">檢查並匯入本機</button>
+          <p id="backupMsg" class="small"></p>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>離線與 PWA 狀態</h2>
+        <div id="pwaStatus" class="diagnostic-grid"></div>
+        <p class="small">離線功能只保證已快取的介面可開啟；Google Sheet 同步仍需要網路。</p>
+      </article>
+
       <article class="card">
         <h2>目前個人基準</h2>
         <div class="lab-pair"><span>身高</span><b>174 cm</b></div>
@@ -448,5 +611,6 @@
 </div>
 <script src="app.js"></script>
 <script src="health_intelligence.js"></script>
+<script src="multi_marker_engine.js"></script>
 </body>
 </html>

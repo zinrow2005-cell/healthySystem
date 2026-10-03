@@ -58,7 +58,7 @@ const titles={
   lifestyle:["健康建議","依目前檢驗與體重提供飲食、運動與作息建議"],
   report:["健康報告","比較最近一次與歷史資料，整理下一步"],
   labs:["全部檢驗","查看歷次健康與檢驗資料"],
-  add:["新增完整檢驗","有驗的項目才填，留白不會當成 0"],
+  add:["新增檢驗","常用整批、資料庫搜尋與未知檢驗都從這裡輸入"],
   settings:["資料連線","Google Sheet + Apps Script"],
   more:["更多","異常提醒、健康建議、報告、檢驗與設定"]
 };
@@ -382,12 +382,18 @@ function renderReport(){
   Object.entries(LAB_META).forEach(([f,m])=>{
     const c=latestValue(f); if(!c)return;
     const p=previousValue(f),cur=n(c[f]),prev=p?n(p[f]):null,st=statusFor(f,cur);
-    let change="—",cls="delta-neutral";
-    if(prev!==null){const d=cur-prev;if(d<0){change="↓";cls="delta-good"}else if(d>0){change="↑";cls="delta-watch"}else change="持平";}
+    let change=`<span class="change-badge change-none">無前次</span>`,cls="delta-neutral";
+    if(prev!==null){
+      const d=cur-prev;
+      const amount=fmt(Math.abs(d),m[2]);
+      if(d<0){change=`<span class="change-badge change-down"><b>↓</b><span>下降 ${amount}${m[1]?" "+m[1]:""}</span></span>`;cls="delta-neutral"}
+      else if(d>0){change=`<span class="change-badge change-up"><b>↑</b><span>上升 ${amount}${m[1]?" "+m[1]:""}</span></span>`;cls="delta-neutral"}
+      else change=`<span class="change-badge change-flat"><b>—</b><span>持平</span></span>`;
+    }
     if(st.level==="watch") watch.push(`${m[0]}：${fmt(cur,m[2])} ${m[1]}（${st.text}）`);
     else if(st.level==="ok") stable.push(`${m[0]}：${fmt(cur,m[2])} ${m[1]}`);
     if(prev!==null && ((f==="creatinine"&&cur<prev)||(f==="egfr"&&cur>prev)||(f==="hba1c"&&cur<prev))) improved.push(`${m[0]}：${fmt(prev,m[2])} → ${fmt(cur,m[2])} ${m[1]}`);
-    table.push(`<tr><td>${m[0]}</td><td>${fmt(cur,m[2])} ${m[1]}</td><td>${prev===null?"—":fmt(prev,m[2])+" "+m[1]}</td><td class="${cls}">${change}</td><td>${st.text}</td></tr>`);
+    table.push(`<tr><td>${m[0]}</td><td>${fmt(cur,m[2])} ${m[1]}</td><td>${prev===null?"—":fmt(prev,m[2])+" "+m[1]}</td><td class="${cls} report-change-cell">${change}</td><td>${st.text}</td></tr>`);
   });
   $("#reportImproved").innerHTML=(improved.length?improved:["目前沒有足夠前次資料可比較。"]).map(x=>`<div class="advice-item">${x}</div>`).join("");
   $("#reportWatch").innerHTML=(watch.length?watch:["目前沒有系統標記的明顯追蹤項目。"]).map(x=>`<div class="advice-item">${x}</div>`).join("");
@@ -493,7 +499,7 @@ function clearLabForm(){
 }
 
 function renderAll(){
-  renderDashboard();renderWeightLog();renderTrends();renderAlerts();renderLifestyle();renderLabs();renderReport();renderCompleteness();renderSyncDiagnostics(); if(window.HealthIntel?.getDB?.()) window.HealthIntel.render(window.HealthIntel.analyze(records));
+  renderDashboard();renderWeightLog();renderTrends();renderAlerts();renderLifestyle();renderLabs();renderReport();renderCompleteness();renderSyncDiagnostics(); if(window.HealthIntel?.getDB?.()) window.HealthIntel.render(window.HealthIntel.analyze(records)); if(window.MultiMarker?.getDB?.()) window.MultiMarker.render();
   const l=latest();const sw=latestNonNull("weight"); $("#settingsWeight").textContent=sw===null?"尚無體重":`${fmt(sw,1)} kg`;
 }
 function setPage(id){
@@ -661,4 +667,478 @@ document.addEventListener("click",e=>{
   }
   const labToggle=e.target.closest(".lab-date-toggle");
   if(labToggle)labToggle.closest(".lab-date-group")?.classList.toggle("open");
+});
+
+
+/* ===== V15.3 Dynamic Lab Registry ===== */
+let customLabs=[];
+let dynamicLabRegistry=null;
+
+function normalizeCustomLabCode(name,code){
+  const base=(code||name||"").toLowerCase().trim()
+    .replace(/[^\p{L}\p{N}]+/gu,"_").replace(/^_+|_+$/g,"");
+  return base||"custom_test";
+}
+function customLabStatus(r){
+  const v=n(r.value);
+  if(v===null)return {level:"none",text:"未輸入數值"};
+  const lo=n(r.ref_low),hi=n(r.ref_high);
+  if(lo!==null&&v<lo)return {level:"watch",text:`低於參考下限 ${lo}`};
+  if(hi!==null&&v>hi)return {level:"watch",text:`高於參考上限 ${hi}`};
+  if(lo!==null||hi!==null)return {level:"ok",text:"位於輸入的參考範圍內"};
+  if(r.ref_text)return {level:"none",text:`參考：${r.ref_text}`};
+  return {level:"none",text:"尚未提供參考範圍"};
+}
+function customLabRuleSupport(r){
+  if(!dynamicLabRegistry)return false;
+  const name=String(r.test_name||"").toLowerCase();
+  const code=String(r.test_code||"").toLowerCase();
+  return Object.entries(dynamicLabRegistry.known_examples||{}).some(([k,v])=>
+    k===code || (v.aliases||[]).some(a=>name===String(a).toLowerCase())
+  );
+}
+function renderCustomLabs(){
+  const q=($("#customLabSearch")?.value||"").trim().toLowerCase();
+  const list=$("#customLabList");
+  if(list){
+    const rows=[...customLabs].sort((a,b)=>dateKey(b.date).localeCompare(dateKey(a.date)))
+      .filter(r=>!q||String(r.test_name||"").toLowerCase().includes(q)||String(r.test_code||"").toLowerCase().includes(q));
+    list.innerHTML=rows.map(r=>{
+      const st=customLabStatus(r),supported=customLabRuleSupport(r);
+      return `<div class="custom-lab-row">
+        <div><b>${r.test_name||r.test_code}</b><span>${displayDate(r.date)}</span></div>
+        <div><strong>${fmt(n(r.value),3)}${r.unit?" "+r.unit:""}</strong><small>${st.text}</small></div>
+        <div><span class="support-pill ${supported?"supported":"unsupported"}">${supported?"已識別・待專屬規則":"未支援專屬規則"}</span></div>
+        <div class="table-action"><button class="edit-custom-lab" data-id="${r.id}">編輯</button><button class="delete-custom-lab" data-id="${r.id}">刪除</button></div>
+      </div>`;
+    }).join("")||"<p class='small'>尚無自訂檢驗資料。</p>";
+  }
+  const unsupported=$("#unsupportedLabList");
+  if(unsupported){
+    const map=new Map();
+    customLabs.filter(r=>!customLabRuleSupport(r)).forEach(r=>{
+      const k=r.test_code||r.test_name;
+      if(!map.has(k))map.set(k,{name:r.test_name||k,count:0,last:r.date});
+      const x=map.get(k);x.count++;if(dateKey(r.date)>dateKey(x.last))x.last=r.date;
+    });
+    unsupported.innerHTML=[...map.values()].map(x=>`<div class="unsupported-item"><b>${x.name}</b><span>${x.count} 筆紀錄</span><small>最近 ${displayDate(x.last)}・目前僅做保存與參考範圍判讀</small></div>`).join("")||"<p class='small'>目前沒有未知檢驗項目。</p>";
+  }
+}
+function previewCustomLab(){
+  const r={
+    value:val("#customLabValue"),ref_low:val("#customLabLow"),ref_high:val("#customLabHigh"),
+    ref_text:$("#customLabRefText")?.value||"",test_name:$("#customLabName")?.value||"",test_code:$("#customLabCode")?.value||""
+  };
+  const st=customLabStatus(r),box=$("#customLabPreview");
+  if(box)box.innerHTML=`<div class="preview-status ${st.level}"><b>${st.text}</b><span>${customLabRuleSupport(r)?"系統已識別此類檢驗，但仍以檢驗單參考範圍優先。":"尚未有專屬智慧規則，系統不會自行診斷。"}</span></div>`;
+}
+function customLabFormRecord(){
+  const name=$("#customLabName")?.value.trim()||"";
+  const code=normalizeCustomLabCode(name,$("#customLabCode")?.value||"");
+  return {
+    id:$("#customLabName")?.dataset.editId||crypto.randomUUID?.()||("cl_"+Date.now()),
+    date:$("#customLabDate")?.value||"",
+    test_name:name,
+    test_code:code,
+    loinc_code:$("#customLabLoinc")?.value.trim()||"",
+    value:val("#customLabValue"),
+    unit:$("#customLabUnit")?.value.trim()||"",
+    ref_low:val("#customLabLow"),
+    ref_high:val("#customLabHigh"),
+    ref_text:$("#customLabRefText")?.value.trim()||"",
+    note:$("#customLabNote")?.value.trim()||""
+  };
+}
+function clearCustomLabForm(){
+  ["#customLabName","#customLabCode","#customLabLoinc","#customLabValue","#customLabUnit","#customLabLow","#customLabHigh","#customLabRefText","#customLabNote"].forEach(s=>{const e=$(s);if(e)e.value=""});
+  if($("#customLabName"))delete $("#customLabName").dataset.editId;
+  $("#customLabMsg").textContent="";
+  previewCustomLab();
+}
+async function saveCustomLab(){
+  const r=customLabFormRecord();
+  if(!r.date||!r.test_name||r.value===null){$("#customLabMsg").textContent="請至少填日期、檢驗名稱與數值。";return}
+  if(r.ref_low!==null&&r.ref_high!==null&&r.ref_low>r.ref_high){$("#customLabMsg").textContent="參考下限不能大於上限。";return}
+  const api=localStorage.getItem("healthApiUrl")||"";
+  if(api){
+    try{
+      const d=await apiPost({action:"custom_lab_upsert",record:r});
+      if(!d.ok)throw new Error(d.error||"儲存失敗");
+      await loadCustomLabs();
+      $("#customLabMsg").textContent="已儲存到 Google Sheet。";
+      clearCustomLabForm();return;
+    }catch(e){$("#customLabMsg").textContent="雲端儲存失敗："+e.message;return}
+  }
+  const idx=customLabs.findIndex(x=>x.id===r.id);
+  if(idx>=0)customLabs[idx]=r;else customLabs.push(r);
+  localStorage.setItem("healthCustomLabs",JSON.stringify(customLabs));
+  renderCustomLabs();clearCustomLabForm();
+}
+async function deleteCustomLab(id){
+  if(!confirm("確定刪除這筆自訂檢驗嗎？"))return;
+  const api=localStorage.getItem("healthApiUrl")||"";
+  if(api){
+    try{await apiPost({action:"custom_lab_delete",id});await loadCustomLabs();return}catch(e){alert("刪除失敗："+e.message);return}
+  }
+  customLabs=customLabs.filter(x=>x.id!==id);localStorage.setItem("healthCustomLabs",JSON.stringify(customLabs));renderCustomLabs();
+}
+function editCustomLab(id){
+  const r=customLabs.find(x=>x.id===id);if(!r)return;
+  $("#customLabDate").value=dateKey(r.date);
+  $("#customLabName").value=r.test_name||"";
+  $("#customLabName").dataset.editId=r.id;
+  $("#customLabCode").value=r.test_code||"";
+  if($("#customLabLoinc"))$("#customLabLoinc").value=r.loinc_code||"";
+  $("#customLabValue").value=r.value??"";
+  $("#customLabUnit").value=r.unit||"";
+  $("#customLabLow").value=r.ref_low??"";
+  $("#customLabHigh").value=r.ref_high??"";
+  $("#customLabRefText").value=r.ref_text||"";
+  $("#customLabNote").value=r.note||"";
+  previewCustomLab();
+  setPage("add"); setEntryMode("catalog");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+async function loadCustomLabs(){
+  const local=JSON.parse(localStorage.getItem("healthCustomLabs")||"[]");
+  const api=localStorage.getItem("healthApiUrl")||"";
+  if(!api){customLabs=local;renderCustomLabs();return}
+  try{
+    const d=await apiGet("custom_lab_list");
+    customLabs=Array.isArray(d.records)?d.records:local;
+  }catch(e){customLabs=local}
+  renderCustomLabs();
+}
+async function initDynamicLabRegistry(){
+  await loadCustomLabProfiles();
+  try{dynamicLabRegistry=await fetch("dynamic_lab_registry_v15.json",{cache:"no-store"}).then(r=>r.json())}catch(e){dynamicLabRegistry={known_examples:{}}}
+  await loadCustomLabs();
+  const today=new Date();const y=today.getFullYear(),m=String(today.getMonth()+1).padStart(2,"0"),d=String(today.getDate()).padStart(2,"0");
+  if($("#customLabDate")&&!$("#customLabDate").value)$("#customLabDate").value=`${y}-${m}-${d}`;
+  renderCustomLabs();previewCustomLab();
+}
+window.addEventListener("load",()=>{
+  $("#saveCustomLabBtn")?.addEventListener("click",saveCustomLab);
+  $("#clearCustomLabBtn")?.addEventListener("click",clearCustomLabForm);
+  $("#customLabSearch")?.addEventListener("input",renderCustomLabs);
+  $("#customLabTrendSelect")?.addEventListener("change",renderCustomLabTrend);
+  $("#customLabName")?.addEventListener("change",()=>{applyCustomLabProfileHints();previewCustomLab()});
+  ["#customLabName","#customLabCode","#customLabValue","#customLabLow","#customLabHigh","#customLabRefText"].forEach(s=>$(s)?.addEventListener("input",previewCustomLab));
+  document.addEventListener("click",e=>{
+    const edit=e.target.closest(".edit-custom-lab");if(edit)editCustomLab(edit.dataset.id);
+    const del=e.target.closest(".delete-custom-lab");if(del)deleteCustomLab(del.dataset.id);
+  });
+  initDynamicLabRegistry();
+});
+
+
+/* ===== V15.4 Dynamic Lab Intelligence ===== */
+let customLabProfiles={};
+
+function customLabCanonical(r){
+  const rawCode=String(r.test_code||"").trim().toLowerCase();
+  const rawName=String(r.test_name||"").trim().toLowerCase();
+  if(dynamicLabRegistry?.known_examples){
+    for(const [code,meta] of Object.entries(dynamicLabRegistry.known_examples)){
+      if(rawCode===code)return code;
+      if((meta.aliases||[]).some(a=>String(a).toLowerCase()===rawName))return code;
+    }
+  }
+  return rawCode||normalizeCustomLabCode(rawName,"");
+}
+function customLabGroups(){
+  const map=new Map();
+  customLabs.forEach(r=>{
+    const code=customLabCanonical(r);
+    if(!map.has(code))map.set(code,{code,name:r.test_name||code,unit:r.unit||"",rows:[]});
+    const g=map.get(code);g.rows.push(r);
+    if(!g.unit&&r.unit)g.unit=r.unit;
+    if(r.test_name)g.name=r.test_name;
+  });
+  for(const g of map.values())g.rows.sort((a,b)=>dateKey(a.date).localeCompare(dateKey(b.date)));
+  return [...map.values()].sort((a,b)=>a.name.localeCompare(b.name,"zh-Hant"));
+}
+function renderCustomLabTrendSelect(){
+  const sel=$("#customLabTrendSelect");if(!sel)return;
+  const groups=customLabGroups();
+  const prev=sel.value;
+  sel.innerHTML=groups.map(g=>`<option value="${g.code}">${g.name} (${g.rows.length})</option>`).join("")||'<option value="">尚無資料</option>';
+  if(groups.some(g=>g.code===prev))sel.value=prev;
+}
+function renderCustomLabTrend(){
+  const sel=$("#customLabTrendSelect"),canvas=$("#customLabTrendChart"),box=$("#customLabTrendSummary");
+  if(!sel||!canvas||!box)return;
+  const g=customLabGroups().find(x=>x.code===sel.value);
+  if(!g){
+    drawLine(canvas,[],[]);
+    box.innerHTML="<p class='small'>尚無可顯示的自訂檢驗資料。</p>";return;
+  }
+  const vals=g.rows.map(r=>n(r.value)).filter(v=>v!==null);
+  const usable=g.rows.filter(r=>n(r.value)!==null);
+  drawLine(canvas,usable.map(r=>n(r.value)),usable.map(r=>displayDate(r.date,true)),{
+    fullLabels:usable.map(r=>displayDate(r.date,false)),
+    unit:g.unit||""
+  });
+  const first=usable[0],last=usable.at(-1);
+  const prev=usable.length>1?usable.at(-2):null;
+  const d=prev?n(last.value)-n(prev.value):null;
+  const st=customLabStatus(last||{});
+  let direction="資料不足";
+  if(d!==null)direction=d>0?`較前次上升 ${fmt(Math.abs(d),3)}${g.unit?" "+g.unit:""}`:d<0?`較前次下降 ${fmt(Math.abs(d),3)}${g.unit?" "+g.unit:""}`:"與前次相同";
+  const refParts=[];
+  if(n(last?.ref_low)!==null)refParts.push(`下限 ${last.ref_low}`);
+  if(n(last?.ref_high)!==null)refParts.push(`上限 ${last.ref_high}`);
+  if(last?.ref_text)refParts.push(last.ref_text);
+  box.innerHTML=`<div class="custom-trend-kpis">
+    <div><span>最新</span><b>${fmt(n(last?.value),3)}${g.unit?" "+g.unit:""}</b></div>
+    <div><span>最近變化</span><b>${direction}</b></div>
+    <div><span>參考判讀</span><b>${st.text}</b></div>
+    <div><span>紀錄次數</span><b>${usable.length}</b></div>
+  </div>
+  <p class="small">${refParts.length?`最近一筆參考：${refParts.join("・")}`:"最近一筆未提供參考範圍，系統不自行推定正常值。"}</p>`;
+}
+function renderRulePromotionQueue(){
+  const holder=$("#unsupportedLabList");if(!holder)return;
+  const items=customLabGroups().filter(g=>!customLabRuleSupport(g.rows.at(-1)||{}));
+  holder.innerHTML=items.map(g=>{
+    const count=g.rows.length;
+    const last=g.rows.at(-1);
+    const priority=count>=3?"priority":count===2?"medium":"low";
+    return `<div class="unsupported-item promotion-${priority}">
+      <b>${g.name}</b>
+      <span>${count} 筆紀錄</span>
+      <small>最近 ${displayDate(last.date)}・${count>=3?"已累積足夠趨勢資料，建議優先建立專屬規則":count===2?"已有 2 筆，可先觀察趨勢":"先累積更多資料"}</small>
+    </div>`;
+  }).join("")||"<p class='small'>目前沒有需要升級規則的未知檢驗。</p>";
+}
+function applyCustomLabProfileHints(){
+  const name=$("#customLabName")?.value.trim().toLowerCase()||"";
+  if(!name||!customLabProfiles)return;
+  const p=Object.values(customLabProfiles).find(x=>String(x.name||"").toLowerCase()===name||String(x.code||"").toLowerCase()===name);
+  if(!p)return;
+  if($("#customLabCode")&&!$("#customLabCode").value)$("#customLabCode").value=p.code||"";
+  if($("#customLabUnit")&&!$("#customLabUnit").value)$("#customLabUnit").value=p.unit||"";
+}
+async function loadCustomLabProfiles(){
+  try{
+    const d=await fetch("custom_lab_profiles_v15.json",{cache:"no-store"}).then(r=>r.json());
+    customLabProfiles={};
+    (d.profiles||[]).forEach(p=>customLabProfiles[p.code]=p);
+  }catch(e){customLabProfiles={}}
+}
+
+
+/* ===== V15.5 Comprehensive Lab Catalog ===== */
+let labCatalog=null;
+async function loadLabCatalog(){
+  try{labCatalog=await fetch("lab_catalog_v15.json",{cache:"no-store"}).then(r=>r.json())}
+  catch(e){labCatalog={tests:[],categories:[],count:0}}
+  const cat=$("#labCatalogCategory");
+  if(cat){
+    cat.innerHTML='<option value="all">全部分類</option>'+labCatalog.categories.map(x=>`<option value="${x}">${x}</option>`).join("");
+  }
+  renderLabCatalog();
+}
+function labCatalogText(t){
+  return [t.code,t.name_en,t.name_zh,...(t.aliases||[])].join(" ").toLowerCase();
+}
+function renderLabCatalog(){
+  const root=$("#labCatalogResults");if(!root||!labCatalog)return;
+  const q=($("#labCatalogSearch")?.value||"").trim().toLowerCase();
+  const cat=$("#labCatalogCategory")?.value||"all";
+  let rows=labCatalog.tests.filter(t=>(cat==="all"||t.category===cat)&&(!q||labCatalogText(t).includes(q)));
+  rows=rows.slice(0,80);
+  root.innerHTML=rows.map(t=>`<button type="button" class="lab-catalog-item" data-catalog-code="${t.code}">
+      <div><b>${t.name_zh||t.name_en}</b><span>${t.name_en}</span></div>
+      <div><small>${t.category}</small><strong>${t.unit_hint||"單位依報告"}</strong></div>
+    </button>`).join("")||"<p class='small'>找不到項目。你仍可以在上方直接輸入新的檢驗名稱。</p>";
+  const st=$("#catalogStats");if(st)st.textContent=`已預載 ${labCatalog.count} 項・${labCatalog.categories.length} 類`;
+}
+function useCatalogItem(code){
+  const t=labCatalog?.tests?.find(x=>x.code===code);if(!t)return;
+  $("#customLabName").value=t.name_en||t.name_zh||t.code;
+  $("#customLabCode").value=t.code;
+  if(!$("#customLabUnit").value)$("#customLabUnit").value=t.unit_hint||"";
+  if($("#customLabLoinc")&&t.loinc_code)$("#customLabLoinc").value=t.loinc_code;
+  previewCustomLab();
+  $("#customLabValue")?.focus();
+}
+window.addEventListener("load",()=>{
+  loadLabCatalog();
+  $("#labCatalogSearch")?.addEventListener("input",renderLabCatalog);
+  $("#labCatalogCategory")?.addEventListener("change",renderLabCatalog);
+  document.addEventListener("click",e=>{
+    const b=e.target.closest(".lab-catalog-item");
+    if(b)useCatalogItem(b.dataset.catalogCode);
+  });
+});
+
+
+/* ===== V15.6 Unified Lab Entry ===== */
+function setEntryMode(mode){
+  const valid=["batch","catalog","manage"];
+  if(!valid.includes(mode))mode="batch";
+  document.querySelectorAll("#entryModeSwitch button").forEach(b=>b.classList.toggle("active",b.dataset.entryMode===mode));
+  document.querySelectorAll("#add .entry-mode-panel").forEach(p=>{
+    const panel=p.dataset.entryPanel||"";
+    if(panel==="batch")p.classList.toggle("active",mode==="batch");
+    else p.classList.toggle("active",mode!=="batch");
+  });
+  const catalogArea=document.querySelector("#add [data-entry-panel='catalog']");
+  if(catalogArea){
+    catalogArea.classList.toggle("manage-mode",mode==="manage");
+    catalogArea.classList.toggle("catalog-mode",mode==="catalog");
+  }
+  localStorage.setItem("healthEntryMode",mode);
+  if(mode!=="batch")renderCustomLabs?.();
+}
+window.addEventListener("load",()=>{
+  const mode=localStorage.getItem("healthEntryMode")||"batch";
+  setEntryMode(mode);
+  document.querySelectorAll("#entryModeSwitch button").forEach(b=>b.addEventListener("click",()=>setEntryMode(b.dataset.entryMode)));
+});
+
+
+/* ===== V16.2 Production Readiness ===== */
+function downloadTextFile(filename,text,type="application/json"){
+  const blob=new Blob([text],{type:`${type};charset=utf-8`});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function csvEscape(v){
+  if(v===null||v===undefined)return "";
+  const s=String(v);
+  return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;
+}
+function rowsToCsv(rows){
+  if(!rows.length)return "";
+  const keys=[...new Set(rows.flatMap(r=>Object.keys(r)))];
+  return [keys.join(","),...rows.map(r=>keys.map(k=>csvEscape(r[k])).join(","))].join("\n");
+}
+function exportBackupJson(){
+  const payload={
+    format:"HealthMonitorBackup",
+    version:"16.2",
+    exported_at:new Date().toISOString(),
+    core_records:typeof records!=="undefined"?records:[],
+    custom_labs:typeof customLabs!=="undefined"?customLabs:[],
+    settings:{
+      height_m:typeof HEIGHT_M!=="undefined"?HEIGHT_M:null,
+      api_configured:!!localStorage.getItem("healthApiUrl")
+    }
+  };
+  downloadTextFile(`health-backup-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(payload,null,2));
+}
+function exportCoreCsv(){
+  downloadTextFile(`health-core-${new Date().toISOString().slice(0,10)}.csv`,rowsToCsv(records||[]),"text/csv");
+}
+function exportCustomCsv(){
+  downloadTextFile(`health-custom-labs-${new Date().toISOString().slice(0,10)}.csv`,rowsToCsv(typeof customLabs!=="undefined"?customLabs:[]),"text/csv");
+}
+function duplicateHealthDates(){
+  const counts={};(records||[]).forEach(r=>{const d=dateKey(r.date);counts[d]=(counts[d]||0)+1});
+  return Object.entries(counts).filter(([,n])=>n>1);
+}
+function duplicateCustomLabs(){
+  const counts={};
+  (typeof customLabs!=="undefined"?customLabs:[]).forEach(r=>{
+    const k=`${dateKey(r.date)}|${String(r.test_code||r.test_name||"").trim().toLowerCase()}`;
+    counts[k]=(counts[k]||0)+1;
+  });
+  return Object.entries(counts).filter(([,n])=>n>1);
+}
+function suspiciousCoreValues(){
+  const limits={
+    weight:[25,300],systolic_bp:[60,260],diastolic_bp:[30,180],fasting_glucose:[20,700],hba1c:[2,20],
+    creatinine:[0.1,20],bun:[1,200],egfr:[1,180],uric_acid:[0.5,25],sodium:[90,180],potassium:[1.5,8],
+    hb:[3,25],wbc:[0.2,100],plt:[5,1500],inr:[0.3,15]
+  };
+  const out=[];
+  (records||[]).forEach(r=>Object.entries(limits).forEach(([f,[lo,hi]])=>{
+    const v=n(r[f]);if(v!==null&&(v<lo||v>hi))out.push({date:r.date,field:f,value:v});
+  }));
+  return out;
+}
+async function productionChecks(){
+  const checks=[];
+  const push=(name,status,detail)=>checks.push({name,status,detail});
+  push("核心健康資料",records?.length?"pass":"warn",records?.length?`${records.length} 筆資料已載入`:"目前沒有核心健康資料");
+  const cl=typeof customLabs!=="undefined"?customLabs:[];
+  push("自訂檢驗資料","pass",`${cl.length} 筆`);
+  const dup=duplicateHealthDates();
+  push("核心資料重複日期",dup.length?"warn":"pass",dup.length?`${dup.length} 個日期有重複列，建議整理；同日多項資料應合併在同一列`:"未發現重複日期");
+  const cdup=duplicateCustomLabs();
+  push("自訂檢驗重複",cdup.length?"warn":"pass",cdup.length?`${cdup.length} 組同日同項重複`:"未發現同日同項重複");
+  const suspect=suspiciousCoreValues();
+  push("極端／疑似輸入錯誤值",suspect.length?"warn":"pass",suspect.length?`${suspect.length} 筆需要人工確認`:"未發現明顯超出防呆範圍的數值");
+  push("多指標智慧引擎",window.MultiMarker?.getDB?.()?"pass":"fail",window.MultiMarker?.getDB?.()?`${window.MultiMarker.getDB().systems?.length||0} 個聯合分析群組已載入`:"多指標規則庫尚未載入");
+  push("單項智慧引擎",window.HealthIntel?.getDB?.()?"pass":"fail",window.HealthIntel?.getDB?.()?"規則庫已載入":"規則庫尚未載入");
+  push("瀏覽器儲存",(()=>{try{localStorage.setItem("__health_test","1");localStorage.removeItem("__health_test");return true}catch(e){return false}})()?"pass":"fail","localStorage");
+  push("目前網路",navigator.onLine?"pass":"warn",navigator.onLine?"已連線":"目前離線");
+  if("serviceWorker" in navigator){
+    try{
+      const reg=await navigator.serviceWorker.ready;
+      push("PWA Service Worker",reg?"pass":"warn",reg?"已啟用":"尚未 ready");
+    }catch(e){push("PWA Service Worker","warn","註冊失敗或尚未啟用")}
+  }else push("PWA Service Worker","warn","此瀏覽器不支援");
+  const api=localStorage.getItem("healthApiUrl")||"";
+  if(api){
+    try{
+      const ping=await apiGet("ping");
+      const list=await apiGet("list");
+      let customCount="未檢查";
+      try{const c=await apiGet("custom_lab_list");customCount=Array.isArray(c.records)?c.records.length:0}catch(e){}
+      push("Google Apps Script","pass",`${ping.version||""}・核心 ${Array.isArray(list.records)?list.records.length:0} 筆・自訂 ${customCount} 筆`);
+    }catch(e){push("Google Apps Script","fail","連線或讀取失敗："+e.message)}
+  }else push("Google Apps Script","warn","尚未設定，現在使用本機資料");
+  return checks;
+}
+function renderProductionChecks(checks){
+  const pass=checks.filter(x=>x.status==="pass").length;
+  const warn=checks.filter(x=>x.status==="warn").length;
+  const fail=checks.filter(x=>x.status==="fail").length;
+  const sum=$("#productionCheckSummary");
+  if(sum)sum.innerHTML=`<div><b>${pass}</b><span>通過</span></div><div><b>${warn}</b><span>注意</span></div><div><b>${fail}</b><span>失敗</span></div>`;
+  const list=$("#productionCheckList");
+  if(list)list.innerHTML=checks.map(x=>`<div class="production-check-row status-${x.status}"><span>${x.status==="pass"?"✓":x.status==="warn"?"!":"×"}</span><div><b>${x.name}</b><small>${x.detail}</small></div></div>`).join("");
+}
+async function runProductionChecks(){
+  const btn=$("#runProductionCheckBtn");if(btn){btn.disabled=true;btn.textContent="檢查中…"}
+  try{renderProductionChecks(await productionChecks())}
+  finally{if(btn){btn.disabled=false;btn.textContent="重新檢查"}}
+}
+async function importBackupLocal(){
+  const file=$("#importJsonFile")?.files?.[0];
+  if(!file){$("#backupMsg").textContent="請先選擇 JSON 備份檔。";return}
+  try{
+    const d=JSON.parse(await file.text());
+    if(d.format!=="HealthMonitorBackup"||!Array.isArray(d.core_records)||!Array.isArray(d.custom_labs))throw new Error("不是相容的健康系統備份格式");
+    if(!confirm(`將把 ${d.core_records.length} 筆核心資料與 ${d.custom_labs.length} 筆自訂檢驗寫入此裝置的本機資料。Google Sheet 不會被覆蓋。確定繼續？`))return;
+    localStorage.setItem("healthLocalData",JSON.stringify(d.core_records));
+    localStorage.setItem("healthCustomLabs",JSON.stringify(d.custom_labs));
+    $("#backupMsg").textContent="已匯入本機。若目前有設定 Google Sheet，重新整理時仍會以雲端資料為主。";
+    if(!localStorage.getItem("healthApiUrl"))location.reload();
+  }catch(e){$("#backupMsg").textContent="匯入失敗："+e.message}
+}
+function renderPwaStatus(){
+  const box=$("#pwaStatus");if(!box)return;
+  const installed=window.matchMedia?.("(display-mode: standalone)")?.matches||navigator.standalone===true;
+  box.innerHTML=`<div><span>網路</span><b>${navigator.onLine?"已連線":"離線"}</b></div>
+  <div><span>開啟模式</span><b>${installed?"PWA / 主畫面":"瀏覽器"}</b></div>
+  <div><span>Service Worker</span><b>${"serviceWorker" in navigator?"支援":"不支援"}</b></div>`;
+}
+function updateOnlineState(){
+  const b=$("#offlineBanner");if(b)b.hidden=navigator.onLine;
+  renderPwaStatus();
+}
+window.addEventListener("online",updateOnlineState);
+window.addEventListener("offline",updateOnlineState);
+window.addEventListener("load",()=>{
+  updateOnlineState();
+  $("#runProductionCheckBtn")?.addEventListener("click",runProductionChecks);
+  $("#exportJsonBtn")?.addEventListener("click",exportBackupJson);
+  $("#exportCoreCsvBtn")?.addEventListener("click",exportCoreCsv);
+  $("#exportCustomCsvBtn")?.addEventListener("click",exportCustomCsv);
+  $("#importJsonBtn")?.addEventListener("click",importBackupLocal);
 });

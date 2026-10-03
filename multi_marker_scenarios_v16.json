@@ -1,0 +1,118 @@
+{
+  "version": "16.0",
+  "count": 6,
+  "cases": [
+    {
+      "id": "K01",
+      "name": "腎臟一致惡化",
+      "series": {
+        "egfr": [
+          90,
+          68
+        ],
+        "creatinine": [
+          1.0,
+          1.35
+        ],
+        "uacr": [
+          10,
+          55
+        ],
+        "systolic_bp": [
+          120,
+          145
+        ]
+      },
+      "expect": "kidney_concordant_worsening"
+    },
+    {
+      "id": "K02",
+      "name": "腎臟單項波動",
+      "series": {
+        "egfr": [
+          78,
+          72
+        ],
+        "uacr": [
+          10,
+          12
+        ],
+        "creatinine": [
+          1.18,
+          1.2
+        ]
+      },
+      "expect": "kidney_isolated_fluctuation"
+    },
+    {
+      "id": "M01",
+      "name": "代謝群聚",
+      "series": {
+        "fasting_glucose": [
+          110
+        ],
+        "hba1c": [
+          5.9
+        ],
+        "weight": [
+          88
+        ],
+        "triglycerides": [
+          190
+        ],
+        "systolic_bp": [
+          136
+        ]
+      },
+      "expect": "metabolic_cluster"
+    },
+    {
+      "id": "M02",
+      "name": "代謝改善",
+      "series": {
+        "fasting_glucose": [
+          122,
+          108
+        ],
+        "weight": [
+          90,
+          87
+        ],
+        "triglycerides": [
+          190,
+          145
+        ]
+      },
+      "expect": "metabolic_improving"
+    },
+    {
+      "id": "L01",
+      "name": "肝代謝群聚",
+      "series": {
+        "alt": [
+          58
+        ],
+        "weight": [
+          90
+        ],
+        "triglycerides": [
+          210
+        ]
+      },
+      "expect": "liver_metabolic_cluster"
+    },
+    {
+      "id": "E01",
+      "name": "電解質腎臟",
+      "series": {
+        "potassium": [
+          5.8
+        ],
+        "egfr": [
+          52
+        ]
+      },
+      "expect": "potassium_kidney"
+    }
+  ]
+}

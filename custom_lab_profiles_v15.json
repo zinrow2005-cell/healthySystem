@@ -1,0 +1,71 @@
+{
+  "version": "15.4",
+  "description": "Reusable custom lab profiles. User-entered profiles may override defaults.",
+  "profiles": [
+    {
+      "code": "ferritin",
+      "name": "Ferritin",
+      "unit": "ng/mL"
+    },
+    {
+      "code": "vitamin_d",
+      "name": "25-OH Vitamin D",
+      "unit": "ng/mL"
+    },
+    {
+      "code": "tsh",
+      "name": "TSH",
+      "unit": "mIU/L"
+    },
+    {
+      "code": "free_t4",
+      "name": "Free T4",
+      "unit": "ng/dL"
+    },
+    {
+      "code": "psa",
+      "name": "PSA",
+      "unit": "ng/mL"
+    },
+    {
+      "code": "crp",
+      "name": "CRP",
+      "unit": "mg/L"
+    },
+    {
+      "code": "hs_crp",
+      "name": "hs-CRP",
+      "unit": "mg/L"
+    },
+    {
+      "code": "ck",
+      "name": "CK",
+      "unit": "U/L"
+    },
+    {
+      "code": "amylase",
+      "name": "Amylase",
+      "unit": "U/L"
+    },
+    {
+      "code": "lipase",
+      "name": "Lipase",
+      "unit": "U/L"
+    },
+    {
+      "code": "apob",
+      "name": "ApoB",
+      "unit": "mg/dL"
+    },
+    {
+      "code": "lpa",
+      "name": "Lp(a)",
+      "unit": "mg/dL"
+    },
+    {
+      "code": "cystatin_c",
+      "name": "Cystatin C",
+      "unit": "mg/L"
+    }
+  ]
+}

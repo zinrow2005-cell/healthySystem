@@ -1,0 +1,1861 @@
+{
+  "version": "16.1",
+  "scope_note": "Broad preloaded catalog for recognition/search. It is not a complete copy of LOINC and does not assign clinical reference ranges automatically.",
+  "standards_note": "Catalog uses stable local canonical codes and is LOINC-ready. Official LOINC codes are stored only when verified/provided; blank does not mean unavailable.",
+  "count": 146,
+  "categories": [
+    "Autoimmune",
+    "Cardiac",
+    "Cardiovascular",
+    "Chemistry",
+    "Coagulation",
+    "Differential",
+    "Electrolytes",
+    "Endocrinology",
+    "GI",
+    "Hematology",
+    "Hormones",
+    "Immunology",
+    "Infectious",
+    "Inflammation",
+    "Iron",
+    "Lipids",
+    "Liver",
+    "Muscle",
+    "Pancreas",
+    "Proteins",
+    "Renal",
+    "Trace Elements",
+    "Tumor Markers",
+    "Urinalysis",
+    "Urine",
+    "Vitamins"
+  ],
+  "tests": [
+    {
+      "code": "glucose",
+      "name_en": "Glucose",
+      "name_zh": "血糖",
+      "category": "Chemistry",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "血糖",
+        "Glucose"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "fasting_glucose",
+      "name_en": "Fasting Glucose",
+      "name_zh": "空腹血糖",
+      "category": "Chemistry",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "FPG",
+        "空腹血糖"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "hba1c",
+      "name_en": "HbA1c",
+      "name_zh": "糖化血色素",
+      "category": "Chemistry",
+      "unit_hint": "%",
+      "aliases": [
+        "A1c",
+        "糖化血色素"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "insulin",
+      "name_en": "Insulin",
+      "name_zh": "胰島素",
+      "category": "Endocrinology",
+      "unit_hint": "µIU/mL",
+      "aliases": [
+        "Insulin",
+        "胰島素"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "c_peptide",
+      "name_en": "C-Peptide",
+      "name_zh": "C胜肽",
+      "category": "Endocrinology",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "C-peptide",
+        "C胜肽"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "fructosamine",
+      "name_en": "Fructosamine",
+      "name_zh": "果糖胺",
+      "category": "Chemistry",
+      "unit_hint": "µmol/L",
+      "aliases": [
+        "Fructosamine"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "lactate",
+      "name_en": "Lactate",
+      "name_zh": "乳酸",
+      "category": "Chemistry",
+      "unit_hint": "mmol/L",
+      "aliases": [
+        "Lactic acid",
+        "乳酸"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "uric_acid",
+      "name_en": "Uric Acid",
+      "name_zh": "尿酸",
+      "category": "Chemistry",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Uric acid",
+        "UA"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "bun",
+      "name_en": "BUN",
+      "name_zh": "血中尿素氮",
+      "category": "Renal",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "BUN",
+        "Urea nitrogen"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urea",
+      "name_en": "Urea",
+      "name_zh": "尿素",
+      "category": "Renal",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Urea"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "creatinine",
+      "name_en": "Creatinine",
+      "name_zh": "肌酸酐",
+      "category": "Renal",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Cr",
+        "Creatinine"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "egfr",
+      "name_en": "eGFR",
+      "name_zh": "估算腎絲球過濾率",
+      "category": "Renal",
+      "unit_hint": "mL/min/1.73m²",
+      "aliases": [
+        "eGFR"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "cystatin_c",
+      "name_en": "Cystatin C",
+      "name_zh": "胱蛋白酶抑制劑C",
+      "category": "Renal",
+      "unit_hint": "mg/L",
+      "aliases": [
+        "Cystatin C"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "uacr",
+      "name_en": "Urine Albumin/Creatinine Ratio",
+      "name_zh": "尿白蛋白肌酸酐比",
+      "category": "Urine",
+      "unit_hint": "mg/g",
+      "aliases": [
+        "uACR",
+        "ACR"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_albumin",
+      "name_en": "Urine Albumin",
+      "name_zh": "尿白蛋白",
+      "category": "Urine",
+      "unit_hint": "mg/L",
+      "aliases": [
+        "Microalbumin",
+        "尿白蛋白"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_creatinine",
+      "name_en": "Urine Creatinine",
+      "name_zh": "尿肌酸酐",
+      "category": "Urine",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Urine Cr"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "sodium",
+      "name_en": "Sodium",
+      "name_zh": "鈉",
+      "category": "Electrolytes",
+      "unit_hint": "mmol/L",
+      "aliases": [
+        "Na",
+        "鈉"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "potassium",
+      "name_en": "Potassium",
+      "name_zh": "鉀",
+      "category": "Electrolytes",
+      "unit_hint": "mmol/L",
+      "aliases": [
+        "K",
+        "鉀"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "chloride",
+      "name_en": "Chloride",
+      "name_zh": "氯",
+      "category": "Electrolytes",
+      "unit_hint": "mmol/L",
+      "aliases": [
+        "Cl",
+        "氯"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "bicarbonate",
+      "name_en": "Bicarbonate / CO2",
+      "name_zh": "碳酸氫根",
+      "category": "Electrolytes",
+      "unit_hint": "mmol/L",
+      "aliases": [
+        "CO2",
+        "HCO3"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "calcium",
+      "name_en": "Calcium",
+      "name_zh": "鈣",
+      "category": "Electrolytes",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Ca",
+        "鈣"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ionized_calcium",
+      "name_en": "Ionized Calcium",
+      "name_zh": "游離鈣",
+      "category": "Electrolytes",
+      "unit_hint": "mmol/L",
+      "aliases": [
+        "iCa",
+        "游離鈣"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "phosphorus",
+      "name_en": "Phosphorus",
+      "name_zh": "磷",
+      "category": "Electrolytes",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Phosphorus",
+        "P"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "magnesium",
+      "name_en": "Magnesium",
+      "name_zh": "鎂",
+      "category": "Electrolytes",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Mg",
+        "鎂"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "osmolality",
+      "name_en": "Osmolality",
+      "name_zh": "滲透壓",
+      "category": "Chemistry",
+      "unit_hint": "mOsm/kg",
+      "aliases": [
+        "Osmolality"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ast",
+      "name_en": "AST",
+      "name_zh": "天門冬胺酸轉胺酶",
+      "category": "Liver",
+      "unit_hint": "U/L",
+      "aliases": [
+        "GOT",
+        "AST"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "alt",
+      "name_en": "ALT",
+      "name_zh": "丙胺酸轉胺酶",
+      "category": "Liver",
+      "unit_hint": "U/L",
+      "aliases": [
+        "GPT",
+        "ALT"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "alp",
+      "name_en": "Alkaline Phosphatase",
+      "name_zh": "鹼性磷酸酶",
+      "category": "Liver",
+      "unit_hint": "U/L",
+      "aliases": [
+        "ALP"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ggt",
+      "name_en": "GGT",
+      "name_zh": "γ-麩醯轉移酶",
+      "category": "Liver",
+      "unit_hint": "U/L",
+      "aliases": [
+        "γ-GT",
+        "GGT"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "bilirubin_total",
+      "name_en": "Total Bilirubin",
+      "name_zh": "總膽紅素",
+      "category": "Liver",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "T-Bil",
+        "總膽紅素"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "bilirubin_direct",
+      "name_en": "Direct Bilirubin",
+      "name_zh": "直接膽紅素",
+      "category": "Liver",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "D-Bil",
+        "直接膽紅素"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "albumin",
+      "name_en": "Albumin",
+      "name_zh": "白蛋白",
+      "category": "Proteins",
+      "unit_hint": "g/dL",
+      "aliases": [
+        "Alb",
+        "Albumin"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "total_protein",
+      "name_en": "Total Protein",
+      "name_zh": "總蛋白",
+      "category": "Proteins",
+      "unit_hint": "g/dL",
+      "aliases": [
+        "TP",
+        "總蛋白"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "prealbumin",
+      "name_en": "Prealbumin",
+      "name_zh": "前白蛋白",
+      "category": "Proteins",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Prealbumin"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ammonia",
+      "name_en": "Ammonia",
+      "name_zh": "氨",
+      "category": "Liver",
+      "unit_hint": "µg/dL",
+      "aliases": [
+        "NH3",
+        "Ammonia"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "total_cholesterol",
+      "name_en": "Total Cholesterol",
+      "name_zh": "總膽固醇",
+      "category": "Lipids",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "TC",
+        "Cholesterol"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ldl",
+      "name_en": "LDL-C",
+      "name_zh": "低密度脂蛋白膽固醇",
+      "category": "Lipids",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "LDL",
+        "LDL-C"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "hdl",
+      "name_en": "HDL-C",
+      "name_zh": "高密度脂蛋白膽固醇",
+      "category": "Lipids",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "HDL",
+        "HDL-C"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "triglycerides",
+      "name_en": "Triglycerides",
+      "name_zh": "三酸甘油酯",
+      "category": "Lipids",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "TG",
+        "Triglycerides"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "non_hdl",
+      "name_en": "Non-HDL-C",
+      "name_zh": "非高密度脂蛋白膽固醇",
+      "category": "Lipids",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "non-HDL"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "apob",
+      "name_en": "Apolipoprotein B",
+      "name_zh": "載脂蛋白B",
+      "category": "Lipids",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "ApoB",
+        "APOB"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "apoa1",
+      "name_en": "Apolipoprotein A1",
+      "name_zh": "載脂蛋白A1",
+      "category": "Lipids",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "ApoA1"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "lpa",
+      "name_en": "Lipoprotein(a)",
+      "name_zh": "脂蛋白(a)",
+      "category": "Lipids",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Lp(a)",
+        "LPA"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "hs_crp",
+      "name_en": "hs-CRP",
+      "name_zh": "高敏感度C反應蛋白",
+      "category": "Inflammation",
+      "unit_hint": "mg/L",
+      "aliases": [
+        "hsCRP",
+        "hs-CRP"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "troponin_i",
+      "name_en": "Troponin I",
+      "name_zh": "心肌鈣蛋白I",
+      "category": "Cardiac",
+      "unit_hint": "ng/L",
+      "aliases": [
+        "TnI",
+        "Troponin I"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "troponin_t",
+      "name_en": "Troponin T",
+      "name_zh": "心肌鈣蛋白T",
+      "category": "Cardiac",
+      "unit_hint": "ng/L",
+      "aliases": [
+        "TnT",
+        "Troponin T"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ck_mb",
+      "name_en": "CK-MB",
+      "name_zh": "肌酸激酶MB",
+      "category": "Cardiac",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "CKMB",
+        "CK-MB"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "bnp",
+      "name_en": "BNP",
+      "name_zh": "B型利鈉胜肽",
+      "category": "Cardiac",
+      "unit_hint": "pg/mL",
+      "aliases": [
+        "BNP"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "nt_probnp",
+      "name_en": "NT-proBNP",
+      "name_zh": "N端前B型利鈉胜肽",
+      "category": "Cardiac",
+      "unit_hint": "pg/mL",
+      "aliases": [
+        "NT-proBNP"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "wbc",
+      "name_en": "WBC",
+      "name_zh": "白血球",
+      "category": "Hematology",
+      "unit_hint": "10^3/µL",
+      "aliases": [
+        "WBC",
+        "白血球"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "rbc",
+      "name_en": "RBC",
+      "name_zh": "紅血球",
+      "category": "Hematology",
+      "unit_hint": "10^6/µL",
+      "aliases": [
+        "RBC",
+        "紅血球"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "hb",
+      "name_en": "Hemoglobin",
+      "name_zh": "血紅素",
+      "category": "Hematology",
+      "unit_hint": "g/dL",
+      "aliases": [
+        "Hb",
+        "Hemoglobin"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "hct",
+      "name_en": "Hematocrit",
+      "name_zh": "血比容",
+      "category": "Hematology",
+      "unit_hint": "%",
+      "aliases": [
+        "Hct",
+        "Hematocrit"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "mcv",
+      "name_en": "MCV",
+      "name_zh": "平均紅血球容積",
+      "category": "Hematology",
+      "unit_hint": "fL",
+      "aliases": [
+        "MCV"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "mch",
+      "name_en": "MCH",
+      "name_zh": "平均紅血球血紅素量",
+      "category": "Hematology",
+      "unit_hint": "pg",
+      "aliases": [
+        "MCH"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "mchc",
+      "name_en": "MCHC",
+      "name_zh": "平均紅血球血紅素濃度",
+      "category": "Hematology",
+      "unit_hint": "g/dL",
+      "aliases": [
+        "MCHC"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "rdw",
+      "name_en": "RDW",
+      "name_zh": "紅血球分布寬度",
+      "category": "Hematology",
+      "unit_hint": "%",
+      "aliases": [
+        "RDW"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "plt",
+      "name_en": "Platelets",
+      "name_zh": "血小板",
+      "category": "Hematology",
+      "unit_hint": "10^3/µL",
+      "aliases": [
+        "PLT",
+        "Platelet"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "mpv",
+      "name_en": "MPV",
+      "name_zh": "平均血小板容積",
+      "category": "Hematology",
+      "unit_hint": "fL",
+      "aliases": [
+        "MPV"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "neutrophils",
+      "name_en": "Neutrophils",
+      "name_zh": "嗜中性球",
+      "category": "Differential",
+      "unit_hint": "%",
+      "aliases": [
+        "Neutrophil",
+        "NEUT"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "lymphocytes",
+      "name_en": "Lymphocytes",
+      "name_zh": "淋巴球",
+      "category": "Differential",
+      "unit_hint": "%",
+      "aliases": [
+        "Lymphocyte",
+        "LYMPH"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "monocytes",
+      "name_en": "Monocytes",
+      "name_zh": "單核球",
+      "category": "Differential",
+      "unit_hint": "%",
+      "aliases": [
+        "Monocyte",
+        "MONO"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "eosinophils",
+      "name_en": "Eosinophils",
+      "name_zh": "嗜酸性球",
+      "category": "Differential",
+      "unit_hint": "%",
+      "aliases": [
+        "Eosinophil",
+        "EOS"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "basophils",
+      "name_en": "Basophils",
+      "name_zh": "嗜鹼性球",
+      "category": "Differential",
+      "unit_hint": "%",
+      "aliases": [
+        "Basophil",
+        "BASO"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "reticulocytes",
+      "name_en": "Reticulocytes",
+      "name_zh": "網狀紅血球",
+      "category": "Hematology",
+      "unit_hint": "%",
+      "aliases": [
+        "Retic",
+        "Reticulocyte"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ferritin",
+      "name_en": "Ferritin",
+      "name_zh": "鐵蛋白",
+      "category": "Iron",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "Ferritin",
+        "鐵蛋白"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "iron",
+      "name_en": "Serum Iron",
+      "name_zh": "血清鐵",
+      "category": "Iron",
+      "unit_hint": "µg/dL",
+      "aliases": [
+        "Fe",
+        "Iron"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "tibc",
+      "name_en": "TIBC",
+      "name_zh": "總鐵結合力",
+      "category": "Iron",
+      "unit_hint": "µg/dL",
+      "aliases": [
+        "TIBC"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "transferrin",
+      "name_en": "Transferrin",
+      "name_zh": "轉鐵蛋白",
+      "category": "Iron",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Transferrin"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "transferrin_saturation",
+      "name_en": "Transferrin Saturation",
+      "name_zh": "轉鐵蛋白飽和度",
+      "category": "Iron",
+      "unit_hint": "%",
+      "aliases": [
+        "TSAT",
+        "Transferrin saturation"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "vitamin_b12",
+      "name_en": "Vitamin B12",
+      "name_zh": "維生素B12",
+      "category": "Vitamins",
+      "unit_hint": "pg/mL",
+      "aliases": [
+        "B12",
+        "Vitamin B12"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "folate",
+      "name_en": "Folate",
+      "name_zh": "葉酸",
+      "category": "Vitamins",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "Folate",
+        "Folic acid"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "pt",
+      "name_en": "PT",
+      "name_zh": "凝血酶原時間",
+      "category": "Coagulation",
+      "unit_hint": "sec",
+      "aliases": [
+        "PT"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "inr",
+      "name_en": "INR",
+      "name_zh": "國際標準化比值",
+      "category": "Coagulation",
+      "unit_hint": "",
+      "aliases": [
+        "INR"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ptt",
+      "name_en": "aPTT / PTT",
+      "name_zh": "活化部分凝血活酶時間",
+      "category": "Coagulation",
+      "unit_hint": "sec",
+      "aliases": [
+        "aPTT",
+        "PTT"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "fibrinogen",
+      "name_en": "Fibrinogen",
+      "name_zh": "纖維蛋白原",
+      "category": "Coagulation",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Fibrinogen"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "d_dimer",
+      "name_en": "D-Dimer",
+      "name_zh": "D-二聚體",
+      "category": "Coagulation",
+      "unit_hint": "ng/mL FEU",
+      "aliases": [
+        "D-dimer"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "tsh",
+      "name_en": "TSH",
+      "name_zh": "促甲狀腺激素",
+      "category": "Endocrinology",
+      "unit_hint": "mIU/L",
+      "aliases": [
+        "TSH"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "free_t4",
+      "name_en": "Free T4",
+      "name_zh": "游離甲狀腺素",
+      "category": "Endocrinology",
+      "unit_hint": "ng/dL",
+      "aliases": [
+        "FT4",
+        "Free T4"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "free_t3",
+      "name_en": "Free T3",
+      "name_zh": "游離三碘甲狀腺素",
+      "category": "Endocrinology",
+      "unit_hint": "pg/mL",
+      "aliases": [
+        "FT3",
+        "Free T3"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "t4",
+      "name_en": "Total T4",
+      "name_zh": "總甲狀腺素",
+      "category": "Endocrinology",
+      "unit_hint": "µg/dL",
+      "aliases": [
+        "T4"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "t3",
+      "name_en": "Total T3",
+      "name_zh": "總三碘甲狀腺素",
+      "category": "Endocrinology",
+      "unit_hint": "ng/dL",
+      "aliases": [
+        "T3"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "anti_tpo",
+      "name_en": "Anti-TPO",
+      "name_zh": "甲狀腺過氧化酶抗體",
+      "category": "Autoimmune",
+      "unit_hint": "IU/mL",
+      "aliases": [
+        "Anti-TPO",
+        "TPOAb"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "anti_tg",
+      "name_en": "Anti-Thyroglobulin",
+      "name_zh": "抗甲狀腺球蛋白抗體",
+      "category": "Autoimmune",
+      "unit_hint": "IU/mL",
+      "aliases": [
+        "TgAb"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "cortisol",
+      "name_en": "Cortisol",
+      "name_zh": "皮質醇",
+      "category": "Endocrinology",
+      "unit_hint": "µg/dL",
+      "aliases": [
+        "Cortisol"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "acth",
+      "name_en": "ACTH",
+      "name_zh": "促腎上腺皮質激素",
+      "category": "Endocrinology",
+      "unit_hint": "pg/mL",
+      "aliases": [
+        "ACTH"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "aldosterone",
+      "name_en": "Aldosterone",
+      "name_zh": "醛固酮",
+      "category": "Endocrinology",
+      "unit_hint": "ng/dL",
+      "aliases": [
+        "Aldosterone"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "renin",
+      "name_en": "Renin",
+      "name_zh": "腎素",
+      "category": "Endocrinology",
+      "unit_hint": "ng/mL/hr",
+      "aliases": [
+        "Renin"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "prolactin",
+      "name_en": "Prolactin",
+      "name_zh": "泌乳素",
+      "category": "Endocrinology",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "PRL",
+        "Prolactin"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "testosterone",
+      "name_en": "Testosterone",
+      "name_zh": "睪固酮",
+      "category": "Hormones",
+      "unit_hint": "ng/dL",
+      "aliases": [
+        "Testosterone"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "free_testosterone",
+      "name_en": "Free Testosterone",
+      "name_zh": "游離睪固酮",
+      "category": "Hormones",
+      "unit_hint": "pg/mL",
+      "aliases": [
+        "Free Testosterone"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "estradiol",
+      "name_en": "Estradiol",
+      "name_zh": "雌二醇",
+      "category": "Hormones",
+      "unit_hint": "pg/mL",
+      "aliases": [
+        "E2",
+        "Estradiol"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "lh",
+      "name_en": "LH",
+      "name_zh": "黃體生成素",
+      "category": "Hormones",
+      "unit_hint": "mIU/mL",
+      "aliases": [
+        "LH"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "fsh",
+      "name_en": "FSH",
+      "name_zh": "濾泡刺激素",
+      "category": "Hormones",
+      "unit_hint": "mIU/mL",
+      "aliases": [
+        "FSH"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "dhea_s",
+      "name_en": "DHEA-S",
+      "name_zh": "硫酸脫氫表雄酮",
+      "category": "Hormones",
+      "unit_hint": "µg/dL",
+      "aliases": [
+        "DHEA-S"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "vitamin_d",
+      "name_en": "25-OH Vitamin D",
+      "name_zh": "25羥維生素D",
+      "category": "Vitamins",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "25-OH Vitamin D",
+        "Vitamin D"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "zinc",
+      "name_en": "Zinc",
+      "name_zh": "鋅",
+      "category": "Trace Elements",
+      "unit_hint": "µg/dL",
+      "aliases": [
+        "Zn",
+        "Zinc"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "copper",
+      "name_en": "Copper",
+      "name_zh": "銅",
+      "category": "Trace Elements",
+      "unit_hint": "µg/dL",
+      "aliases": [
+        "Cu",
+        "Copper"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "selenium",
+      "name_en": "Selenium",
+      "name_zh": "硒",
+      "category": "Trace Elements",
+      "unit_hint": "µg/L",
+      "aliases": [
+        "Selenium"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "crp",
+      "name_en": "CRP",
+      "name_zh": "C反應蛋白",
+      "category": "Inflammation",
+      "unit_hint": "mg/L",
+      "aliases": [
+        "CRP"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "esr",
+      "name_en": "ESR",
+      "name_zh": "紅血球沉降速率",
+      "category": "Inflammation",
+      "unit_hint": "mm/hr",
+      "aliases": [
+        "ESR"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ana",
+      "name_en": "ANA",
+      "name_zh": "抗核抗體",
+      "category": "Autoimmune",
+      "unit_hint": "",
+      "aliases": [
+        "ANA"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "rf",
+      "name_en": "Rheumatoid Factor",
+      "name_zh": "類風濕因子",
+      "category": "Autoimmune",
+      "unit_hint": "IU/mL",
+      "aliases": [
+        "RF"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "anti_ccp",
+      "name_en": "Anti-CCP",
+      "name_zh": "抗環瓜胺酸抗體",
+      "category": "Autoimmune",
+      "unit_hint": "U/mL",
+      "aliases": [
+        "Anti-CCP",
+        "CCP"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "c3",
+      "name_en": "Complement C3",
+      "name_zh": "補體C3",
+      "category": "Autoimmune",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "C3"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "c4",
+      "name_en": "Complement C4",
+      "name_zh": "補體C4",
+      "category": "Autoimmune",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "C4"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ige",
+      "name_en": "IgE",
+      "name_zh": "免疫球蛋白E",
+      "category": "Immunology",
+      "unit_hint": "IU/mL",
+      "aliases": [
+        "IgE"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "igg",
+      "name_en": "IgG",
+      "name_zh": "免疫球蛋白G",
+      "category": "Immunology",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "IgG"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "iga",
+      "name_en": "IgA",
+      "name_zh": "免疫球蛋白A",
+      "category": "Immunology",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "IgA"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "igm",
+      "name_en": "IgM",
+      "name_zh": "免疫球蛋白M",
+      "category": "Immunology",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "IgM"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "amylase",
+      "name_en": "Amylase",
+      "name_zh": "澱粉酶",
+      "category": "Pancreas",
+      "unit_hint": "U/L",
+      "aliases": [
+        "Amylase"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "lipase",
+      "name_en": "Lipase",
+      "name_zh": "脂肪酶",
+      "category": "Pancreas",
+      "unit_hint": "U/L",
+      "aliases": [
+        "Lipase"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "fecal_occult_blood",
+      "name_en": "Fecal Occult Blood",
+      "name_zh": "糞便潛血",
+      "category": "GI",
+      "unit_hint": "",
+      "aliases": [
+        "FOBT",
+        "FIT"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "calprotectin",
+      "name_en": "Fecal Calprotectin",
+      "name_zh": "糞便鈣衛蛋白",
+      "category": "GI",
+      "unit_hint": "µg/g",
+      "aliases": [
+        "Calprotectin"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "afp",
+      "name_en": "AFP",
+      "name_zh": "甲型胎兒蛋白",
+      "category": "Tumor Markers",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "AFP"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "cea",
+      "name_en": "CEA",
+      "name_zh": "癌胚抗原",
+      "category": "Tumor Markers",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "CEA"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ca199",
+      "name_en": "CA 19-9",
+      "name_zh": "癌抗原19-9",
+      "category": "Tumor Markers",
+      "unit_hint": "U/mL",
+      "aliases": [
+        "CA19-9"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ca125",
+      "name_en": "CA-125",
+      "name_zh": "癌抗原125",
+      "category": "Tumor Markers",
+      "unit_hint": "U/mL",
+      "aliases": [
+        "CA125"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "psa",
+      "name_en": "PSA",
+      "name_zh": "攝護腺特異抗原",
+      "category": "Tumor Markers",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "PSA"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "free_psa",
+      "name_en": "Free PSA",
+      "name_zh": "游離PSA",
+      "category": "Tumor Markers",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "Free PSA"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "hbsag",
+      "name_en": "HBsAg",
+      "name_zh": "B型肝炎表面抗原",
+      "category": "Infectious",
+      "unit_hint": "",
+      "aliases": [
+        "HBsAg"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "anti_hbs",
+      "name_en": "Anti-HBs",
+      "name_zh": "B型肝炎表面抗體",
+      "category": "Infectious",
+      "unit_hint": "mIU/mL",
+      "aliases": [
+        "Anti-HBs"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "anti_hbc",
+      "name_en": "Anti-HBc",
+      "name_zh": "B型肝炎核心抗體",
+      "category": "Infectious",
+      "unit_hint": "",
+      "aliases": [
+        "Anti-HBc"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "anti_hcv",
+      "name_en": "Anti-HCV",
+      "name_zh": "C型肝炎抗體",
+      "category": "Infectious",
+      "unit_hint": "",
+      "aliases": [
+        "Anti-HCV"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "hiv_ag_ab",
+      "name_en": "HIV Ag/Ab",
+      "name_zh": "HIV抗原抗體",
+      "category": "Infectious",
+      "unit_hint": "",
+      "aliases": [
+        "HIV Ag/Ab"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "rpr",
+      "name_en": "RPR",
+      "name_zh": "梅毒快速血漿反應素",
+      "category": "Infectious",
+      "unit_hint": "",
+      "aliases": [
+        "RPR"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "tp_pa",
+      "name_en": "TP-PA",
+      "name_zh": "梅毒螺旋體抗體",
+      "category": "Infectious",
+      "unit_hint": "",
+      "aliases": [
+        "TPPA",
+        "TP-PA"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_protein",
+      "name_en": "Urine Protein",
+      "name_zh": "尿蛋白",
+      "category": "Urinalysis",
+      "unit_hint": "",
+      "aliases": [
+        "Urine Protein"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_blood",
+      "name_en": "Urine Blood",
+      "name_zh": "尿潛血",
+      "category": "Urinalysis",
+      "unit_hint": "",
+      "aliases": [
+        "Occult Blood"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_glucose",
+      "name_en": "Urine Glucose",
+      "name_zh": "尿糖",
+      "category": "Urinalysis",
+      "unit_hint": "",
+      "aliases": [
+        "Urine Glucose"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_ketone",
+      "name_en": "Urine Ketone",
+      "name_zh": "尿酮體",
+      "category": "Urinalysis",
+      "unit_hint": "",
+      "aliases": [
+        "Ketone"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_leukocyte",
+      "name_en": "Urine Leukocyte Esterase",
+      "name_zh": "尿白血球酯酶",
+      "category": "Urinalysis",
+      "unit_hint": "",
+      "aliases": [
+        "Leukocyte Esterase"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_nitrite",
+      "name_en": "Urine Nitrite",
+      "name_zh": "尿亞硝酸鹽",
+      "category": "Urinalysis",
+      "unit_hint": "",
+      "aliases": [
+        "Nitrite"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_ph",
+      "name_en": "Urine pH",
+      "name_zh": "尿液酸鹼值",
+      "category": "Urinalysis",
+      "unit_hint": "",
+      "aliases": [
+        "Urine pH"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_specific_gravity",
+      "name_en": "Urine Specific Gravity",
+      "name_zh": "尿比重",
+      "category": "Urinalysis",
+      "unit_hint": "",
+      "aliases": [
+        "Specific Gravity"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ck",
+      "name_en": "Creatine Kinase",
+      "name_zh": "肌酸激酶",
+      "category": "Muscle",
+      "unit_hint": "U/L",
+      "aliases": [
+        "CK",
+        "CPK"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "ldh",
+      "name_en": "LDH",
+      "name_zh": "乳酸脫氫酶",
+      "category": "Chemistry",
+      "unit_hint": "U/L",
+      "aliases": [
+        "LDH"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "myoglobin",
+      "name_en": "Myoglobin",
+      "name_zh": "肌紅蛋白",
+      "category": "Muscle",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "Myoglobin"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "homocysteine",
+      "name_en": "Homocysteine",
+      "name_zh": "同半胱胺酸",
+      "category": "Cardiovascular",
+      "unit_hint": "µmol/L",
+      "aliases": [
+        "Homocysteine"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "procalcitonin",
+      "name_en": "Procalcitonin",
+      "name_zh": "降鈣素原",
+      "category": "Inflammation",
+      "unit_hint": "ng/mL",
+      "aliases": [
+        "PCT",
+        "Procalcitonin"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "beta_hydroxybutyrate",
+      "name_en": "Beta-Hydroxybutyrate",
+      "name_zh": "β-羥丁酸",
+      "category": "Chemistry",
+      "unit_hint": "mmol/L",
+      "aliases": [
+        "BHB",
+        "Beta-hydroxybutyrate"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "pth",
+      "name_en": "Parathyroid Hormone",
+      "name_zh": "副甲狀腺素",
+      "category": "Endocrinology",
+      "unit_hint": "pg/mL",
+      "aliases": [
+        "PTH",
+        "Intact PTH"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "anion_gap",
+      "name_en": "Anion Gap",
+      "name_zh": "陰離子間隙",
+      "category": "Chemistry",
+      "unit_hint": "mmol/L",
+      "aliases": [
+        "AG",
+        "Anion gap"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_rbc",
+      "name_en": "Urine RBC",
+      "name_zh": "尿液紅血球",
+      "category": "Urinalysis",
+      "unit_hint": "/HPF",
+      "aliases": [
+        "Urine RBC",
+        "RBC/HPF"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "urine_wbc",
+      "name_en": "Urine WBC",
+      "name_zh": "尿液白血球",
+      "category": "Urinalysis",
+      "unit_hint": "/HPF",
+      "aliases": [
+        "Urine WBC",
+        "WBC/HPF"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    },
+    {
+      "code": "direct_ldl",
+      "name_en": "Direct LDL-C",
+      "name_zh": "直接測定LDL-C",
+      "category": "Lipids",
+      "unit_hint": "mg/dL",
+      "aliases": [
+        "Direct LDL",
+        "dLDL"
+      ],
+      "loinc_code": "",
+      "mapping_status": "canonical_name_ready"
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "version": "15.2",
+  "purpose": "Low-risk adaptive lifestyle and follow-up suggestions based on entered health data and trends.",
+  "rules": [
+    {
+      "id": "glucose_watch",
+      "module": "glucose",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "diet",
+      "text": "血糖需要追蹤時，優先減少含糖飲與精緻澱粉，保留規律三餐並增加蔬菜與高纖食物。"
+    },
+    {
+      "id": "glucose_activity",
+      "module": "glucose",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "exercise",
+      "text": "若沒有醫療禁忌，可維持規律中等強度活動；餐後短時間步行也可作為較容易執行的方式。"
+    },
+    {
+      "id": "weight_watch",
+      "module": "weight",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "action",
+      "text": "體位偏高時，先以可持續的緩慢減重為主，不追求短期快速下降。"
+    },
+    {
+      "id": "kidney_watch",
+      "module": "kidney",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "diet",
+      "text": "腎功能需要追蹤時，避免自行採高蛋白減重或大量蛋白粉；鹽分與加工食品也應控制。"
+    },
+    {
+      "id": "kidney_follow",
+      "module": "kidney",
+      "levels": [
+        "priority"
+      ],
+      "category": "followup",
+      "text": "腎臟指標若明顯異常或趨勢惡化，建議複查並與醫療人員討論 eGFR、尿蛋白 / uACR 等完整資料。"
+    },
+    {
+      "id": "bp_watch",
+      "module": "blood_pressure",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "diet",
+      "text": "血壓偏高時，減少高鹽加工食品、醃漬物與重鹹醬料，並保留規律居家血壓紀錄。"
+    },
+    {
+      "id": "bp_activity",
+      "module": "blood_pressure",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "exercise",
+      "text": "血壓需要管理時，規律中等強度有氧活動通常比偶爾高強度運動更容易長期維持。"
+    },
+    {
+      "id": "lipid_watch",
+      "module": "lipids",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "diet",
+      "text": "血脂偏高時，優先降低油炸、加工肉與高飽和脂肪來源，增加蔬菜、豆類與其他高纖食物。"
+    },
+    {
+      "id": "uric_watch",
+      "module": "uric_acid",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "diet",
+      "text": "尿酸偏高時，避免脫水、暴飲暴食與快速減重，並減少大量內臟、濃肉湯等高普林來源。"
+    },
+    {
+      "id": "liver_watch",
+      "module": "liver",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "followup",
+      "text": "肝酵素異常時，應以該次檢驗單參考範圍為主，若持續異常建議進一步醫療評估。"
+    },
+    {
+      "id": "electrolyte_watch",
+      "module": "electrolytes",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "followup",
+      "text": "電解質異常若持續或幅度較大，建議複查；不要自行用大量補充品矯正。"
+    },
+    {
+      "id": "cbc_watch",
+      "module": "cbc",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "followup",
+      "text": "血球數值異常需結合症狀、實驗室參考範圍與其他血球指標，不建議只依單一數值自行處理。"
+    },
+    {
+      "id": "coag_watch",
+      "module": "coagulation",
+      "levels": [
+        "watch",
+        "priority"
+      ],
+      "category": "followup",
+      "text": "凝血數值異常需考慮檢驗方法與是否使用抗凝藥物；明顯異常應由醫療人員評估。"
+    }
+  ],
+  "defaults": {
+    "diet": [
+      "以原型食物為主，避免過量精緻糖、加工食品與高鹽飲食。"
+    ],
+    "exercise": [
+      "若無醫療禁忌，維持規律活動並逐步增加，不需要一次追求高強度。"
+    ],
+    "sleep": [
+      "維持規律睡眠與固定作息；睡眠不足可能影響體重、血糖與血壓管理。"
+    ],
+    "action": [
+      "持續記錄體重與檢驗數據；判斷重點放在多次趨勢，而不是單一次數值。"
+    ]
+  }
+}

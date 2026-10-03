@@ -1,0 +1,1208 @@
+{
+  "version": "15.6",
+  "policy": "Do not invent LOINC codes. Store official LOINC codes only when verified from a trusted source or supplied by the laboratory.",
+  "fields": [
+    "local_code",
+    "loinc_code",
+    "status",
+    "aliases"
+  ],
+  "mappings": [
+    {
+      "local_code": "glucose",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "血糖",
+        "Glucose"
+      ]
+    },
+    {
+      "local_code": "fasting_glucose",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "FPG",
+        "空腹血糖"
+      ]
+    },
+    {
+      "local_code": "hba1c",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "A1c",
+        "糖化血色素"
+      ]
+    },
+    {
+      "local_code": "insulin",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Insulin",
+        "胰島素"
+      ]
+    },
+    {
+      "local_code": "c_peptide",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "C-peptide",
+        "C胜肽"
+      ]
+    },
+    {
+      "local_code": "fructosamine",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Fructosamine"
+      ]
+    },
+    {
+      "local_code": "lactate",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Lactic acid",
+        "乳酸"
+      ]
+    },
+    {
+      "local_code": "uric_acid",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Uric acid",
+        "UA"
+      ]
+    },
+    {
+      "local_code": "bun",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "BUN",
+        "Urea nitrogen"
+      ]
+    },
+    {
+      "local_code": "urea",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Urea"
+      ]
+    },
+    {
+      "local_code": "creatinine",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Cr",
+        "Creatinine"
+      ]
+    },
+    {
+      "local_code": "egfr",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "eGFR"
+      ]
+    },
+    {
+      "local_code": "cystatin_c",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Cystatin C"
+      ]
+    },
+    {
+      "local_code": "uacr",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "uACR",
+        "ACR"
+      ]
+    },
+    {
+      "local_code": "urine_albumin",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Microalbumin",
+        "尿白蛋白"
+      ]
+    },
+    {
+      "local_code": "urine_creatinine",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Urine Cr"
+      ]
+    },
+    {
+      "local_code": "sodium",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Na",
+        "鈉"
+      ]
+    },
+    {
+      "local_code": "potassium",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "K",
+        "鉀"
+      ]
+    },
+    {
+      "local_code": "chloride",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Cl",
+        "氯"
+      ]
+    },
+    {
+      "local_code": "bicarbonate",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "CO2",
+        "HCO3"
+      ]
+    },
+    {
+      "local_code": "calcium",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Ca",
+        "鈣"
+      ]
+    },
+    {
+      "local_code": "ionized_calcium",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "iCa",
+        "游離鈣"
+      ]
+    },
+    {
+      "local_code": "phosphorus",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Phosphorus",
+        "P"
+      ]
+    },
+    {
+      "local_code": "magnesium",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Mg",
+        "鎂"
+      ]
+    },
+    {
+      "local_code": "osmolality",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Osmolality"
+      ]
+    },
+    {
+      "local_code": "ast",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "GOT",
+        "AST"
+      ]
+    },
+    {
+      "local_code": "alt",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "GPT",
+        "ALT"
+      ]
+    },
+    {
+      "local_code": "alp",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "ALP"
+      ]
+    },
+    {
+      "local_code": "ggt",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "γ-GT",
+        "GGT"
+      ]
+    },
+    {
+      "local_code": "bilirubin_total",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "T-Bil",
+        "總膽紅素"
+      ]
+    },
+    {
+      "local_code": "bilirubin_direct",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "D-Bil",
+        "直接膽紅素"
+      ]
+    },
+    {
+      "local_code": "albumin",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Alb",
+        "Albumin"
+      ]
+    },
+    {
+      "local_code": "total_protein",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "TP",
+        "總蛋白"
+      ]
+    },
+    {
+      "local_code": "prealbumin",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Prealbumin"
+      ]
+    },
+    {
+      "local_code": "ammonia",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "NH3",
+        "Ammonia"
+      ]
+    },
+    {
+      "local_code": "total_cholesterol",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "TC",
+        "Cholesterol"
+      ]
+    },
+    {
+      "local_code": "ldl",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "LDL",
+        "LDL-C"
+      ]
+    },
+    {
+      "local_code": "hdl",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "HDL",
+        "HDL-C"
+      ]
+    },
+    {
+      "local_code": "triglycerides",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "TG",
+        "Triglycerides"
+      ]
+    },
+    {
+      "local_code": "non_hdl",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "non-HDL"
+      ]
+    },
+    {
+      "local_code": "apob",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "ApoB",
+        "APOB"
+      ]
+    },
+    {
+      "local_code": "apoa1",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "ApoA1"
+      ]
+    },
+    {
+      "local_code": "lpa",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Lp(a)",
+        "LPA"
+      ]
+    },
+    {
+      "local_code": "hs_crp",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "hsCRP",
+        "hs-CRP"
+      ]
+    },
+    {
+      "local_code": "troponin_i",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "TnI",
+        "Troponin I"
+      ]
+    },
+    {
+      "local_code": "troponin_t",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "TnT",
+        "Troponin T"
+      ]
+    },
+    {
+      "local_code": "ck_mb",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "CKMB",
+        "CK-MB"
+      ]
+    },
+    {
+      "local_code": "bnp",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "BNP"
+      ]
+    },
+    {
+      "local_code": "nt_probnp",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "NT-proBNP"
+      ]
+    },
+    {
+      "local_code": "wbc",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "WBC",
+        "白血球"
+      ]
+    },
+    {
+      "local_code": "rbc",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "RBC",
+        "紅血球"
+      ]
+    },
+    {
+      "local_code": "hb",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Hb",
+        "Hemoglobin"
+      ]
+    },
+    {
+      "local_code": "hct",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Hct",
+        "Hematocrit"
+      ]
+    },
+    {
+      "local_code": "mcv",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "MCV"
+      ]
+    },
+    {
+      "local_code": "mch",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "MCH"
+      ]
+    },
+    {
+      "local_code": "mchc",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "MCHC"
+      ]
+    },
+    {
+      "local_code": "rdw",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "RDW"
+      ]
+    },
+    {
+      "local_code": "plt",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "PLT",
+        "Platelet"
+      ]
+    },
+    {
+      "local_code": "mpv",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "MPV"
+      ]
+    },
+    {
+      "local_code": "neutrophils",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Neutrophil",
+        "NEUT"
+      ]
+    },
+    {
+      "local_code": "lymphocytes",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Lymphocyte",
+        "LYMPH"
+      ]
+    },
+    {
+      "local_code": "monocytes",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Monocyte",
+        "MONO"
+      ]
+    },
+    {
+      "local_code": "eosinophils",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Eosinophil",
+        "EOS"
+      ]
+    },
+    {
+      "local_code": "basophils",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Basophil",
+        "BASO"
+      ]
+    },
+    {
+      "local_code": "reticulocytes",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Retic",
+        "Reticulocyte"
+      ]
+    },
+    {
+      "local_code": "ferritin",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Ferritin",
+        "鐵蛋白"
+      ]
+    },
+    {
+      "local_code": "iron",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Fe",
+        "Iron"
+      ]
+    },
+    {
+      "local_code": "tibc",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "TIBC"
+      ]
+    },
+    {
+      "local_code": "transferrin",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Transferrin"
+      ]
+    },
+    {
+      "local_code": "transferrin_saturation",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "TSAT",
+        "Transferrin saturation"
+      ]
+    },
+    {
+      "local_code": "vitamin_b12",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "B12",
+        "Vitamin B12"
+      ]
+    },
+    {
+      "local_code": "folate",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Folate",
+        "Folic acid"
+      ]
+    },
+    {
+      "local_code": "pt",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "PT"
+      ]
+    },
+    {
+      "local_code": "inr",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "INR"
+      ]
+    },
+    {
+      "local_code": "ptt",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "aPTT",
+        "PTT"
+      ]
+    },
+    {
+      "local_code": "fibrinogen",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Fibrinogen"
+      ]
+    },
+    {
+      "local_code": "d_dimer",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "D-dimer"
+      ]
+    },
+    {
+      "local_code": "tsh",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "TSH"
+      ]
+    },
+    {
+      "local_code": "free_t4",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "FT4",
+        "Free T4"
+      ]
+    },
+    {
+      "local_code": "free_t3",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "FT3",
+        "Free T3"
+      ]
+    },
+    {
+      "local_code": "t4",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "T4"
+      ]
+    },
+    {
+      "local_code": "t3",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "T3"
+      ]
+    },
+    {
+      "local_code": "anti_tpo",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Anti-TPO",
+        "TPOAb"
+      ]
+    },
+    {
+      "local_code": "anti_tg",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "TgAb"
+      ]
+    },
+    {
+      "local_code": "cortisol",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Cortisol"
+      ]
+    },
+    {
+      "local_code": "acth",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "ACTH"
+      ]
+    },
+    {
+      "local_code": "aldosterone",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Aldosterone"
+      ]
+    },
+    {
+      "local_code": "renin",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Renin"
+      ]
+    },
+    {
+      "local_code": "prolactin",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "PRL",
+        "Prolactin"
+      ]
+    },
+    {
+      "local_code": "testosterone",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Testosterone"
+      ]
+    },
+    {
+      "local_code": "free_testosterone",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Free Testosterone"
+      ]
+    },
+    {
+      "local_code": "estradiol",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "E2",
+        "Estradiol"
+      ]
+    },
+    {
+      "local_code": "lh",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "LH"
+      ]
+    },
+    {
+      "local_code": "fsh",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "FSH"
+      ]
+    },
+    {
+      "local_code": "dhea_s",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "DHEA-S"
+      ]
+    },
+    {
+      "local_code": "vitamin_d",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "25-OH Vitamin D",
+        "Vitamin D"
+      ]
+    },
+    {
+      "local_code": "zinc",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Zn",
+        "Zinc"
+      ]
+    },
+    {
+      "local_code": "copper",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Cu",
+        "Copper"
+      ]
+    },
+    {
+      "local_code": "selenium",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Selenium"
+      ]
+    },
+    {
+      "local_code": "crp",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "CRP"
+      ]
+    },
+    {
+      "local_code": "esr",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "ESR"
+      ]
+    },
+    {
+      "local_code": "ana",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "ANA"
+      ]
+    },
+    {
+      "local_code": "rf",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "RF"
+      ]
+    },
+    {
+      "local_code": "anti_ccp",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Anti-CCP",
+        "CCP"
+      ]
+    },
+    {
+      "local_code": "c3",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "C3"
+      ]
+    },
+    {
+      "local_code": "c4",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "C4"
+      ]
+    },
+    {
+      "local_code": "ige",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "IgE"
+      ]
+    },
+    {
+      "local_code": "igg",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "IgG"
+      ]
+    },
+    {
+      "local_code": "iga",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "IgA"
+      ]
+    },
+    {
+      "local_code": "igm",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "IgM"
+      ]
+    },
+    {
+      "local_code": "amylase",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Amylase"
+      ]
+    },
+    {
+      "local_code": "lipase",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Lipase"
+      ]
+    },
+    {
+      "local_code": "fecal_occult_blood",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "FOBT",
+        "FIT"
+      ]
+    },
+    {
+      "local_code": "calprotectin",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Calprotectin"
+      ]
+    },
+    {
+      "local_code": "afp",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "AFP"
+      ]
+    },
+    {
+      "local_code": "cea",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "CEA"
+      ]
+    },
+    {
+      "local_code": "ca199",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "CA19-9"
+      ]
+    },
+    {
+      "local_code": "ca125",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "CA125"
+      ]
+    },
+    {
+      "local_code": "psa",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "PSA"
+      ]
+    },
+    {
+      "local_code": "free_psa",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Free PSA"
+      ]
+    },
+    {
+      "local_code": "hbsag",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "HBsAg"
+      ]
+    },
+    {
+      "local_code": "anti_hbs",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Anti-HBs"
+      ]
+    },
+    {
+      "local_code": "anti_hbc",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Anti-HBc"
+      ]
+    },
+    {
+      "local_code": "anti_hcv",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Anti-HCV"
+      ]
+    },
+    {
+      "local_code": "hiv_ag_ab",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "HIV Ag/Ab"
+      ]
+    },
+    {
+      "local_code": "rpr",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "RPR"
+      ]
+    },
+    {
+      "local_code": "tp_pa",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "TPPA",
+        "TP-PA"
+      ]
+    },
+    {
+      "local_code": "urine_protein",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Urine Protein"
+      ]
+    },
+    {
+      "local_code": "urine_blood",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Occult Blood"
+      ]
+    },
+    {
+      "local_code": "urine_glucose",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Urine Glucose"
+      ]
+    },
+    {
+      "local_code": "urine_ketone",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Ketone"
+      ]
+    },
+    {
+      "local_code": "urine_leukocyte",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Leukocyte Esterase"
+      ]
+    },
+    {
+      "local_code": "urine_nitrite",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Nitrite"
+      ]
+    },
+    {
+      "local_code": "urine_ph",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Urine pH"
+      ]
+    },
+    {
+      "local_code": "urine_specific_gravity",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Specific Gravity"
+      ]
+    },
+    {
+      "local_code": "ck",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "CK",
+        "CPK"
+      ]
+    },
+    {
+      "local_code": "ldh",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "LDH"
+      ]
+    },
+    {
+      "local_code": "myoglobin",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Myoglobin"
+      ]
+    },
+    {
+      "local_code": "homocysteine",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "Homocysteine"
+      ]
+    },
+    {
+      "local_code": "procalcitonin",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "PCT",
+        "Procalcitonin"
+      ]
+    },
+    {
+      "local_code": "beta_hydroxybutyrate",
+      "loinc_code": "",
+      "status": "pending_verified_loinc",
+      "aliases": [
+        "BHB",
+        "Beta-hydroxybutyrate"
+      ]
+    }
+  ]
+}

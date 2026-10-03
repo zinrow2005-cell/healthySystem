@@ -4,7 +4,7 @@
   const LEVEL_RANK={stable:0,watch:1,priority:2,urgent:3};
   const LEVEL_LABEL={stable:"穩定 / 維持",watch:"持續追蹤",priority:"優先處理",urgent:"高度警示"};
   const LEVEL_CLASS={stable:"intel-stable",watch:"intel-watch",priority:"intel-priority",urgent:"intel-urgent"};
-  let DB=null, TESTS=null, REF=null, lastResult=null;
+  let DB=null, TESTS=null, REF=null, ADVICE=null, lastResult=null;
 
   const num=v=>v===null||v===undefined||v===""?null:Number(v);
   const key=d=>{
@@ -15,12 +15,13 @@
   const bmiValue=w=>w?Number(w)/(HEIGHT_M*HEIGHT_M):null;
 
   async function loadDB(){
-    const [r,t,ref]=await Promise.all([
+    const [r,t,ref,advice]=await Promise.all([
       fetch("health_rules_v15.json",{cache:"no-store"}).then(x=>x.json()),
       fetch("scenario_tests_v15.json",{cache:"no-store"}).then(x=>x.json()),
-      fetch("lab_reference_ranges_v15.json",{cache:"no-store"}).then(x=>x.json())
+      fetch("lab_reference_ranges_v15.json",{cache:"no-store"}).then(x=>x.json()),
+      fetch("advice_rules_v15.json",{cache:"no-store"}).then(x=>x.json())
     ]);
-    DB=r; TESTS=t; REF=ref; return DB;
+    DB=r; TESTS=t; REF=ref; ADVICE=advice; return DB;
   }
 
   function sortRows(rows){
@@ -265,6 +266,7 @@
         <div><b>V${DB.version}</b><span>規則庫版本</span></div>`;
     }
     renderReferenceRanges();
+    renderAdaptiveLifestyle();
     renderTestStatus();
   }
   function renderReferenceRanges(){
@@ -336,6 +338,38 @@
       ${r.failed.length?`<details><summary>${r.failed.length} 個需再檢查</summary><pre>${r.failed.slice(0,20).map(x=>`${x.id} ${x.name}: ${x.actual} / expected ${x.expected}`).join("\n")}</pre></details>`:"<p>目前測試未發現嚴重度低估。</p>"}`;
   }
 
+
+  function adaptiveAdvice(result){
+    const out={diet:[],exercise:[],sleep:[],action:[],followup:[]};
+    if(!ADVICE)return out;
+    ADVICE.rules.forEach(rule=>{
+      const hit=result.findings.some(f=>f.module===rule.module && rule.levels.includes(f.level));
+      if(hit && !out[rule.category].includes(rule.text))out[rule.category].push(rule.text);
+    });
+    Object.entries(ADVICE.defaults||{}).forEach(([k,arr])=>{
+      if(out[k] && out[k].length===0)out[k].push(...arr);
+    });
+    if(out.sleep.length===0)out.sleep.push("維持規律睡眠與固定作息，並觀察睡眠、壓力與代謝數值是否同步變化。");
+    return out;
+  }
+  function renderAdaptiveLifestyle(){
+    if(!DB||!ADVICE||typeof records==="undefined")return;
+    const result=analyze(records||[]);
+    const a=adaptiveAdvice(result);
+    const list=x=>`<div class="advice-list">${x.map(v=>`<div class="advice-item">${v}</div>`).join("")}</div>`;
+    const diet=document.querySelector("#dietAdvice");
+    const ex=document.querySelector("#exerciseAdvice");
+    const sl=document.querySelector("#sleepAdvice");
+    const act=document.querySelector("#actionAdvice");
+    if(diet)diet.innerHTML=list(a.diet);
+    if(ex)ex.innerHTML=list(a.exercise);
+    if(sl)sl.innerHTML=list(a.sleep);
+    if(act){
+      const actions=[...a.action,...a.followup];
+      act.innerHTML=list(actions.length?actions:["目前以持續記錄與維持既有健康習慣為主。"]);
+    }
+  }
+
   function bind(){
     document.querySelector("#runSimulationBtn")?.addEventListener("click",runSimulation);
     document.querySelector("#fillLatestBtn")?.addEventListener("click",fillLatest);
@@ -354,5 +388,5 @@
     }
   }
 
-  window.HealthIntel={init,analyze,render,runTests,fillLatest,runSimulation,getDB:()=>DB};
+  window.HealthIntel={init,analyze,render,runTests,fillLatest,runSimulation,getDB:()=>DB,adaptiveAdvice,renderAdaptiveLifestyle};
 })();
