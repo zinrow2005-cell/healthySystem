@@ -1,0 +1,10 @@
+{
+  "version": true,
+  "module_count": 10,
+  "scenario_count": 167,
+  "reference_db": true,
+  "reference_ui": true,
+  "confidence_logic": true,
+  "exact_qa": true,
+  "ref_modules": true
+}

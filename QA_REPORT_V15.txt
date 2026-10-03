@@ -1,0 +1,10 @@
+{
+  "intelligence_page": true,
+  "simulator": true,
+  "rules_json": true,
+  "tests_json": true,
+  "engine_js": true,
+  "test_count": 118,
+  "service_worker_rules": true,
+  "apps_script_v15": true
+}

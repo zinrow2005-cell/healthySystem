@@ -1,0 +1,423 @@
+{
+  "version": "15.1",
+  "updated": "2026-10-03",
+  "purpose": "Future manual-entry health analysis rules with configurable laboratory reference ranges, trend confidence, and QA.",
+  "safety": {
+    "diagnosis": "Do not diagnose from one entry. Use confirmatory language and trend context.",
+    "medications": "Do not recommend starting, stopping, or changing prescription medication doses.",
+    "emergency": "Escalate only for clearly severe values/symptoms and advise urgent medical care.",
+    "lab_reference": "Laboratory-specific reference ranges override generic defaults when available."
+  },
+  "sources": [
+    {
+      "id": "ADA2026",
+      "name": "ADA Standards of Care in Diabetes—2026",
+      "url": "https://diabetesjournals.org/care/article/49/Supplement_1/S27/163926/2-Diagnosis-and-Classification-of-Diabetes",
+      "used_for": [
+        "fasting_glucose",
+        "hba1c"
+      ]
+    },
+    {
+      "id": "KDIGO2024",
+      "name": "KDIGO 2024 CKD Evaluation and Management Guideline",
+      "url": "https://kdigo.org/guidelines/ckd-evaluation-and-management/",
+      "used_for": [
+        "egfr",
+        "uacr",
+        "kidney_trends"
+      ]
+    },
+    {
+      "id": "AHA_BP",
+      "name": "American Heart Association Blood Pressure Categories",
+      "url": "https://www.heart.org/en/health-topics/high-blood-pressure/blood-pressure-explained",
+      "used_for": [
+        "systolic_bp",
+        "diastolic_bp"
+      ]
+    },
+    {
+      "id": "ACC_AHA_2026_LIPID",
+      "name": "2026 ACC/AHA Dyslipidemia Guideline",
+      "url": "https://www.acc.org/about-acc/press-releases/2026/03/13/18/01/accaha-issue-updated-guideline-for-managing-lipids-cholesterol",
+      "used_for": [
+        "ldl",
+        "triglycerides"
+      ]
+    },
+    {
+      "id": "AHA_CHOL",
+      "name": "American Heart Association — What Your Cholesterol Levels Mean",
+      "url": "https://www.heart.org/en/health-topics/cholesterol/about-cholesterol/what-your-cholesterol-levels-mean",
+      "used_for": [
+        "triglycerides"
+      ]
+    },
+    {
+      "id": "ACR_GOUT_2020",
+      "name": "American College of Rheumatology 2020 Gout Guideline",
+      "url": "https://rheumatology.org/Portals/0/Files/Gout-Guideline-Final-2020.pdf",
+      "used_for": [
+        "uric_acid_context"
+      ]
+    },
+    {
+      "id": "TW_HPA_BMI",
+      "name": "Taiwan Health Promotion Administration — Adult BMI standard",
+      "url": "https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=542&pid=9737&sid=979",
+      "used_for": [
+        "bmi"
+      ]
+    }
+  ],
+  "modules": {
+    "glucose": {
+      "label": "血糖 / HbA1c",
+      "fields": [
+        "fasting_glucose",
+        "hba1c"
+      ],
+      "thresholds": {
+        "fasting_glucose": [
+          {
+            "max_exclusive": 100,
+            "level": "stable",
+            "message": "空腹血糖目前未達糖尿病前期門檻。"
+          },
+          {
+            "min": 100,
+            "max_exclusive": 126,
+            "level": "watch",
+            "message": "空腹血糖位於糖尿病前期範圍，適合持續追蹤並加強體重、飲食與活動管理。"
+          },
+          {
+            "min": 126,
+            "level": "priority",
+            "message": "空腹血糖已達糖尿病診斷門檻之一；若沒有典型高血糖症狀，仍需由醫療人員用確認性檢驗判定。"
+          }
+        ],
+        "hba1c": [
+          {
+            "max_exclusive": 5.7,
+            "level": "stable",
+            "message": "HbA1c 目前未達糖尿病前期門檻。"
+          },
+          {
+            "min": 5.7,
+            "max_exclusive": 6.5,
+            "level": "watch",
+            "message": "HbA1c 位於糖尿病前期範圍，建議與空腹血糖及體重趨勢一起看。"
+          },
+          {
+            "min": 6.5,
+            "level": "priority",
+            "message": "HbA1c 已達糖尿病診斷門檻之一；若沒有明確高血糖症狀，需由醫療人員確認。"
+          }
+        ]
+      },
+      "trend": {
+        "last_n": 3,
+        "rise_abs": {
+          "fasting_glucose": 10,
+          "hba1c": 0.3
+        }
+      }
+    },
+    "kidney": {
+      "label": "腎功能",
+      "fields": [
+        "creatinine",
+        "egfr",
+        "uacr",
+        "bun"
+      ],
+      "thresholds": {
+        "egfr": [
+          {
+            "min": 90,
+            "level": "stable",
+            "message": "eGFR 目前較高，仍應搭配尿白蛋白與長期趨勢解讀。"
+          },
+          {
+            "min": 60,
+            "max_exclusive": 90,
+            "level": "watch",
+            "message": "eGFR 介於 60–89；單次數值本身不能直接判定慢性腎臟病，需結合持續時間與腎損傷標記。"
+          },
+          {
+            "max_exclusive": 60,
+            "level": "priority",
+            "message": "eGFR 低於 60，建議複查並由醫療人員評估是否為持續性異常。"
+          }
+        ],
+        "uacr": [
+          {
+            "max_exclusive": 30,
+            "level": "stable",
+            "message": "uACR 目前低於 30 mg/g。"
+          },
+          {
+            "min": 30,
+            "max_exclusive": 300,
+            "level": "watch",
+            "message": "uACR 已達中度增加範圍，建議確認是否持續。"
+          },
+          {
+            "min": 300,
+            "level": "priority",
+            "message": "uACR 明顯升高，建議醫療評估與複查。"
+          }
+        ]
+      },
+      "trend": {
+        "egfr_change_pct": 20,
+        "uacr_fold": 2
+      }
+    },
+    "blood_pressure": {
+      "label": "血壓",
+      "fields": [
+        "systolic_bp",
+        "diastolic_bp"
+      ],
+      "categories": [
+        {
+          "id": "normal",
+          "level": "stable",
+          "systolic_max": 119,
+          "diastolic_max": 79,
+          "message": "血壓位於正常範圍。"
+        },
+        {
+          "id": "elevated",
+          "level": "watch",
+          "systolic_min": 120,
+          "systolic_max": 129,
+          "diastolic_max": 79,
+          "message": "收縮壓偏高，建議持續規律量測與生活管理。"
+        },
+        {
+          "id": "stage1",
+          "level": "watch",
+          "systolic_min": 130,
+          "systolic_max": 139,
+          "diastolic_min": 80,
+          "diastolic_max": 89,
+          "or_logic": true,
+          "message": "血壓落在高血壓第 1 期分類範圍；診斷仍需合適量測與醫療判斷。"
+        },
+        {
+          "id": "stage2",
+          "level": "priority",
+          "systolic_min": 140,
+          "diastolic_min": 90,
+          "or_logic": true,
+          "message": "血壓落在高血壓第 2 期分類範圍，建議與醫療人員討論並確認多次量測。"
+        },
+        {
+          "id": "severe",
+          "level": "urgent",
+          "systolic_min": 181,
+          "diastolic_min": 121,
+          "or_logic": true,
+          "message": "血壓非常高。重新正確量測；若伴胸痛、呼吸困難、神經學症狀或視力改變，應立即急診 / 119；即使無症狀也應儘快聯絡醫療人員。"
+        }
+      ]
+    },
+    "lipids": {
+      "label": "血脂",
+      "fields": [
+        "total_cholesterol",
+        "ldl",
+        "hdl",
+        "triglycerides"
+      ],
+      "thresholds": {
+        "triglycerides": [
+          {
+            "max_exclusive": 150,
+            "level": "stable",
+            "message": "三酸甘油酯目前低於 150 mg/dL。"
+          },
+          {
+            "min": 150,
+            "max_exclusive": 500,
+            "level": "watch",
+            "message": "三酸甘油酯偏高，建議與飲食、體重、血糖及整體心血管風險一起管理。"
+          },
+          {
+            "min": 500,
+            "level": "priority",
+            "message": "三酸甘油酯很高，除了心血管風險外也需注意胰臟炎風險，建議儘快醫療評估。"
+          }
+        ],
+        "ldl": [
+          {
+            "max_exclusive": 130,
+            "level": "stable",
+            "message": "LDL 數值需配合整體 ASCVD 風險判讀；目前未達本系統的高優先警示門檻。"
+          },
+          {
+            "min": 130,
+            "max_exclusive": 190,
+            "level": "watch",
+            "message": "LDL 偏高，治療目標應依整體心血管風險、共病與醫療評估決定。"
+          },
+          {
+            "min": 190,
+            "level": "priority",
+            "message": "LDL ≥190 mg/dL 屬高度重要的異常值，建議醫療評估與治療討論。"
+          }
+        ]
+      }
+    },
+    "uric_acid": {
+      "label": "尿酸",
+      "fields": [
+        "uric_acid"
+      ],
+      "context_note": "若已確診痛風或正在接受降尿酸治療，ACR treat-to-target 常以血清尿酸 <6 mg/dL 為常見目標；若無此背景，不以單一尿酸值自行診斷或調藥。",
+      "thresholds": [
+        {
+          "max_exclusive": 6,
+          "level": "stable",
+          "message": "若有痛風 / 降尿酸治療背景，此數值符合常見 <6 mg/dL 治療目標。"
+        },
+        {
+          "min": 6,
+          "max_exclusive": 9,
+          "level": "watch",
+          "message": "尿酸較高，重點是看長期趨勢、症狀與是否正在接受降尿酸治療。"
+        },
+        {
+          "min": 9,
+          "level": "priority",
+          "message": "尿酸明顯偏高，若持續或有痛風、結石等症狀，建議醫療評估。"
+        }
+      ]
+    },
+    "liver": {
+      "label": "肝功能",
+      "fields": [
+        "alt",
+        "ast",
+        "ggt"
+      ],
+      "note": "肝酵素參考上限會依實驗室、性別與方法不同。系統只做趨勢提醒；正式判讀以檢驗單參考範圍為準。",
+      "generic_uln": {
+        "alt": 40,
+        "ast": 40,
+        "ggt": 60
+      }
+    },
+    "weight": {
+      "label": "體重 / BMI",
+      "fields": [
+        "weight"
+      ],
+      "bmi": [
+        {
+          "max_exclusive": 18.5,
+          "level": "watch",
+          "message": "BMI 屬過輕範圍。"
+        },
+        {
+          "min": 18.5,
+          "max_exclusive": 24,
+          "level": "stable",
+          "message": "BMI 位於台灣成人健康體位範圍。"
+        },
+        {
+          "min": 24,
+          "max_exclusive": 27,
+          "level": "watch",
+          "message": "BMI 位於台灣成人過重範圍。"
+        },
+        {
+          "min": 27,
+          "level": "priority",
+          "message": "BMI 位於台灣成人肥胖範圍；建議以可持續方式管理體重與代謝風險。"
+        }
+      ],
+      "trend": {
+        "meaningful_change_pct": 5
+      }
+    },
+    "electrolytes": {
+      "label": "電解質",
+      "fields": [
+        "sodium",
+        "potassium"
+      ],
+      "strategy": "reference_range",
+      "note": "優先使用檢驗單參考範圍；通用範圍只作篩檢提示。"
+    },
+    "cbc": {
+      "label": "血球",
+      "fields": [
+        "hb",
+        "hct",
+        "rbc",
+        "wbc",
+        "plt",
+        "mcv",
+        "mch",
+        "mchc"
+      ],
+      "strategy": "reference_range",
+      "note": "血球參考範圍會依性別、年齡、實驗室與儀器不同；以檢驗單為主。"
+    },
+    "coagulation": {
+      "label": "凝血",
+      "fields": [
+        "pt",
+        "inr",
+        "ptt"
+      ],
+      "strategy": "reference_range",
+      "note": "凝血結果受實驗室方法與抗凝藥物影響；以檢驗單與醫療背景為主。"
+    }
+  },
+  "combination_rules": [
+    {
+      "id": "metabolic_cluster",
+      "when": [
+        "fasting_glucose>=100",
+        "bmi>=24",
+        "triglycerides>=150|systolic_bp>=130|diastolic_bp>=80"
+      ],
+      "level": "priority",
+      "title": "多個心血管代謝風險因子集中",
+      "message": "血糖、體位與血脂 / 血壓同時出現不理想訊號。建議不要只處理單一數字，而是一起管理體重、飲食、活動與心血管風險。"
+    },
+    {
+      "id": "kidney_bp_cluster",
+      "when": [
+        "egfr<60|uacr>=30",
+        "systolic_bp>=130|diastolic_bp>=80"
+      ],
+      "level": "priority",
+      "title": "腎功能與血壓需要一起追蹤",
+      "message": "腎臟指標與血壓同時出現需注意訊號，建議帶完整趨勢與醫療人員討論。"
+    },
+    {
+      "id": "glucose_discordant_improving",
+      "when": [
+        "hba1c_decreasing",
+        "fasting_glucose>=100"
+      ],
+      "level": "watch",
+      "title": "HbA1c 改善，但空腹血糖仍偏高",
+      "message": "長期平均血糖可能改善，但空腹血糖仍需持續追蹤；建議保留兩項指標一起看。"
+    }
+  ],
+  "reference_range_policy": {
+    "priority": [
+      "Use user/laboratory-provided reference range when available.",
+      "Otherwise use generic adult reference range only as a screening hint.",
+      "Never use generic range alone to diagnose."
+    ],
+    "storage": "lab_reference_ranges_v15.json"
+  }
+}

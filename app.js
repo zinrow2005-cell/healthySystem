@@ -1,6 +1,8 @@
 const SAMPLE_DATA = [];
 const HEIGHT_M=1.74;
 let records=[];
+let trendRangeDays="all", weightRangeDays="all";
+let lastSyncAt=null;
 
 const $=s=>document.querySelector(s);
 const n=v=>v===null||v===undefined||v===""?null:Number(v);
@@ -23,10 +25,35 @@ function displayDate(raw, short=false){
   const [y,m,d]=k.split("-");
   return short ? `${m}/${d}` : `${y}/${m}/${d}`;
 }
+function recordsInRange(field,days="all"){
+  const all=sorted().filter(r=>n(r[field])!==null);
+  if(days==="all"||!all.length) return all;
+  const lastKey=dateKey(all[all.length-1].date);
+  const lastDate=new Date(lastKey+"T00:00:00+08:00");
+  const cutoff=new Date(lastDate.getTime()-Number(days)*86400000);
+  return all.filter(r=>new Date(dateKey(r.date)+"T00:00:00+08:00")>=cutoff);
+}
+function seriesFor(field,days="all"){
+  const rows=recordsInRange(field,days);
+  return {
+    values:rows.map(r=>n(r[field])),
+    short:rows.map(r=>displayDate(r.date,true)),
+    full:rows.map(r=>displayDate(r.date,false)),
+    dates:rows.map(r=>dateKey(r.date))
+  };
+}
+function compareText(vals,i,unit=""){
+  if(i<=0||i>=vals.length)return "第一筆紀錄";
+  const d=vals[i]-vals[i-1];
+  if(Math.abs(d)<1e-9)return "與前次相同";
+  return `較前次 ${d>0?"+":""}${fmt(d,2)}${unit?" "+unit:""}`;
+}
+
 const titles={
   dashboard:["健康總覽","長期趨勢優先，不只看單次紅字"],
   weightlog:["體重紀錄","定期記錄體重並自動計算 BMI 與趨勢"],
   trends:["趨勢分析","血糖、腎功能、尿酸與體重分開追蹤"],
+  intelligence:["健康智慧","依最新值、趨勢與組合規則產生不同分析與建議"],
   alerts:["異常提醒","紅黃綠燈提示需要追蹤的健康項目"],
   lifestyle:["健康建議","依目前檢驗與體重提供飲食、運動與作息建議"],
   report:["健康報告","比較最近一次與歷史資料，整理下一步"],
@@ -155,10 +182,10 @@ function renderInteractiveLine(canvas){
   ctx.textAlign="left";
 
   if(active!==null && active>=0 && active<vals.length){
-    const p=s.points[active],date=s.fullLabels[active]||labs[active]||"",value=`${fmt(vals[active],2)}${s.unit?" "+s.unit:""}`;
+    const p=s.points[active],date=s.fullLabels[active]||labs[active]||"",value=`${fmt(vals[active],2)}${s.unit?" "+s.unit:""}`,cmp=compareText(vals,active,s.unit);
     ctx.font="13px sans-serif";
     const line1=date,line2=value;
-    const tw=Math.max(ctx.measureText(line1).width,ctx.measureText(line2).width)+24,th=54;
+    const tw=Math.max(ctx.measureText(line1).width,ctx.measureText(line2).width,ctx.measureText(cmp).width)+24,th=72;
     let tx=p.x+12,ty=p.y-th-10;
     if(tx+tw>w-8)tx=p.x-tw-12;
     if(tx<8)tx=8;if(ty<8)ty=p.y+12;
@@ -167,7 +194,7 @@ function renderInteractiveLine(canvas){
     if(ctx.roundRect)ctx.roundRect(tx,ty,tw,th,9);else ctx.rect(tx,ty,tw,th);
     ctx.fill();
     ctx.fillStyle="#fff";ctx.font="12px sans-serif";ctx.fillText(line1,tx+12,ty+20);
-    ctx.font="bold 14px sans-serif";ctx.fillText(line2,tx+12,ty+42);
+    ctx.font="bold 14px sans-serif";ctx.fillText(line2,tx+12,ty+40);ctx.font="11px sans-serif";ctx.fillStyle="#d1d5db";ctx.fillText(cmp,tx+12,ty+60);
   }
 }
 function statusFor(field,val){
@@ -238,7 +265,7 @@ function renderTrends(){
     ["trendWeight","weight","trendWeightText","kg"]
   ];
   configs.forEach(([cid,f,tid,unit])=>{
-    const vals=values(f); drawLine($("#"+cid),vals,labels(f),{fullLabels:fullLabels(f),unit});
+    const s=seriesFor(f,trendRangeDays), vals=s.values; drawLine($("#"+cid),vals,s.short,{fullLabels:s.full,unit});
     if(vals.length>=2){
       const a=vals[vals.length-2],b=vals[vals.length-1];
       $("#"+tid).innerHTML=`<p>最近：${fmt(a,2)} → ${fmt(b,2)} ${unit}，${b<a?"下降":b>a?"上升":"持平"}。</p>`;
@@ -311,13 +338,18 @@ function renderWeightLog(){
     const prev=rev[idx+1],d=prev?r.weight-prev.weight:null,cls=d===null?"delta-neutral":d<0?"delta-good":d>0?"delta-watch":"delta-neutral";
     return `<tr><td>${displayDate(r.date)}</td><td>${fmt(r.weight,1)} kg</td><td>${fmt(bmi(r.weight),1)}</td><td class="${cls}">${d===null?"—":`${d>0?"+":""}${fmt(d,1)} kg`}</td><td><div class="table-action"><button class="edit-weight" data-date="${dateKey(r.date)}">編輯</button><button class="delete-weight" data-date="${dateKey(r.date)}">刪除</button></div></td></tr>`;
   }).join("")||`<tr><td colspan="5">尚無體重紀錄</td></tr>`;
-  drawLine($("#weightLogChart"),rows.map(x=>x.weight),rows.map(x=>displayDate(x.date,true)),{fullLabels:rows.map(x=>displayDate(x.date,false)),unit:"kg"});
+  const wSeries=seriesFor("weight",weightRangeDays);
+  drawLine($("#weightLogChart"),wSeries.values,wSeries.short,{fullLabels:wSeries.full,unit:"kg"});
   if(rows.length){
     const first=rows[0],last=rows[rows.length-1],diff=last.weight-first.weight;
+    const recent7=rows.slice(-7);
+    const prior7=rows.slice(-14,-7);
+    const avg=a=>a.length?a.reduce((s,x)=>s+x.weight,0)/a.length:null;
+    const avg7=avg(recent7),avgPrev=avg(prior7),avgDiff=(avg7!==null&&avgPrev!==null)?avg7-avgPrev:null;
     $("#weightSummary").innerHTML=`<div class="weight-kpi">
       <div><span>最新體重</span><b>${fmt(last.weight,1)} kg</b></div>
       <div><span>BMI</span><b>${fmt(bmi(last.weight),1)}</b></div>
-      <div><span>累積變化</span><b class="${diff<0?"delta-good":diff>0?"delta-watch":"delta-neutral"}">${diff>0?"+":""}${fmt(diff,1)} kg</b></div>
+      <div><span>最近 7 筆平均</span><b>${fmt(avg7,1)} kg</b><small>${avgDiff===null?"資料累積中":`較前 7 筆 ${avgDiff>0?"+":""}${fmt(avgDiff,1)} kg`}</small></div>
     </div>`;
     $("#weightTrendText").innerHTML=`<p>從 ${displayDate(first.date)} 到 ${displayDate(last.date)}，體重 ${diff<0?"下降":diff>0?"上升":"持平"} ${fmt(Math.abs(diff),1)} kg。</p>`;
   }else{
@@ -408,14 +440,14 @@ async function apiPost(payload){
 async function loadData(){
   const api=localStorage.getItem("healthApiUrl")||"";$("#apiUrl").value=api;
   const local=JSON.parse(localStorage.getItem("healthLocalData")||JSON.stringify(SAMPLE_DATA));
-  if(!api){records=local.map(r=>({...r,date:dateKey(r.date)}));$("#syncStatus").textContent="本機資料";renderAll();return;}
+  if(!api){records=local.map(r=>({...r,date:dateKey(r.date)}));lastSyncAt=new Date();$("#syncStatus").textContent="本機資料・未連線";renderAll();return;}
   try{
     $("#syncStatus").textContent="同步中…";
     const d=await apiGet("list");
     records=(Array.isArray(d.records)?d.records:local).map(r=>({...r,date:dateKey(r.date)}));
-    $("#syncStatus").textContent="Google Sheet 已同步";
+    lastSyncAt=new Date(); $("#syncStatus").textContent=`Google Sheet 已同步・${records.length} 筆`;
   }catch(e){
-    records=local.map(r=>({...r,date:dateKey(r.date)}));$("#syncStatus").textContent="同步失敗・使用本機資料";
+    records=local.map(r=>({...r,date:dateKey(r.date)}));lastSyncAt=new Date(); $("#syncStatus").textContent="同步失敗・目前為本機資料";
   }
   renderAll();
 }
@@ -461,7 +493,7 @@ function clearLabForm(){
 }
 
 function renderAll(){
-  renderDashboard();renderWeightLog();renderTrends();renderAlerts();renderLifestyle();renderLabs();renderReport();
+  renderDashboard();renderWeightLog();renderTrends();renderAlerts();renderLifestyle();renderLabs();renderReport();renderCompleteness();renderSyncDiagnostics(); if(window.HealthIntel?.getDB?.()) window.HealthIntel.render(window.HealthIntel.analyze(records));
   const l=latest();const sw=latestNonNull("weight"); $("#settingsWeight").textContent=sw===null?"尚無體重":`${fmt(sw,1)} kg`;
 }
 function setPage(id){
@@ -481,7 +513,7 @@ $("#clearLabBtn").addEventListener("click",clearLabForm);
 $("#saveApiBtn").addEventListener("click",()=>{localStorage.setItem("healthApiUrl",$("#apiUrl").value.trim());$("#apiMsg").textContent="已儲存。";loadData()});
 $("#testApiBtn").addEventListener("click",async()=>{
   const u=$("#apiUrl").value.trim();if(!u){$("#apiMsg").textContent="請先貼上 /exec 網址。";return}
-  try{localStorage.setItem("healthApiUrl",u);const d=await apiGet("ping");$("#apiMsg").textContent=`連線成功：${d.version||""}`}
+  try{localStorage.setItem("healthApiUrl",u);const d=await apiGet("ping");const list=await apiGet("list"); $("#apiMsg").textContent=`連線成功：${d.version||""}・health_records ${Array.isArray(list.records)?list.records.length:0} 筆`}
   catch(e){$("#apiMsg").textContent="連線失敗："+e.message}
 });
 $("#printReportBtn").addEventListener("click",()=>window.print());
@@ -565,8 +597,68 @@ renderLabs=function(){
     });
   });
   $("#labTableBody").innerHTML=rows.join("")||`<tr><td colspan="4">沒有符合條件的資料</td></tr>`;
+  const grouped={};
+  sorted().slice().reverse().forEach(r=>{
+    const items=[];
+    fields.forEach(k=>{
+      const m=LAB_META[k]; if(!m||n(r[k])===null)return;
+      if(q && !m[0].toLowerCase().includes(q))return;
+      items.push({label:m[0],value:fmt(n(r[k]),m[2]),unit:m[1]});
+    });
+    if(items.length) grouped[dateKey(r.date)]={date:displayDate(r.date),items};
+  });
+  const holder=$("#labGroupedList");
+  if(holder){
+    holder.innerHTML=Object.values(grouped).map((g,idx)=>`<div class="lab-date-group ${idx===0?"open":""}">
+      <button class="lab-date-toggle" type="button"><b>${g.date}</b><span>${g.items.length} 項檢驗</span></button>
+      <div class="lab-date-body">${g.items.map(x=>`<div class="lab-mini-row"><span>${x.label}</span><strong>${x.value}</strong><em>${x.unit||""}</em></div>`).join("")}</div>
+    </div>`).join("")||"<p class='small'>沒有符合條件的資料。</p>";
+  }
 };
 window.addEventListener("load",()=>{
   $("#labFilter")?.addEventListener("change",renderLabs);
   $("#labSearch")?.addEventListener("input",renderLabs);
+});
+
+function renderCompleteness(){
+  const groups={
+    "血糖":["fasting_glucose","hba1c"],
+    "腎功能":["creatinine","bun","egfr","uacr"],
+    "血脂":["total_cholesterol","ldl","hdl","triglycerides"],
+    "肝功能":["ast","alt","ggt"],
+    "血壓":["systolic_bp","diastolic_bp"],
+    "體重":["weight"]
+  };
+  const el=$("#dataCompleteness"); if(!el)return;
+  el.innerHTML=Object.entries(groups).map(([name,fields])=>{
+    const dates=new Set();
+    sorted().forEach(r=>{if(fields.some(f=>n(r[f])!==null))dates.add(dateKey(r.date))});
+    const last=[...sorted()].reverse().find(r=>fields.some(f=>n(r[f])!==null));
+    return `<div class="completeness-item"><b>${name}</b><span>${dates.size} 次紀錄</span><span>${last?`最近 ${displayDate(last.date)}`:"尚無資料"}</span></div>`;
+  }).join("");
+}
+function renderSyncDiagnostics(){
+  const el=$("#syncDiagnostics"); if(!el)return;
+  const count=records.length;
+  const latestDate=count?displayDate(sorted()[sorted().length-1]?.date):"—";
+  const api=localStorage.getItem("healthApiUrl")||"";
+  const mode=$("#syncStatus")?.textContent||"";
+  el.innerHTML=`
+    <div class="diagnostic-item ${count===0?"warn":""}"><span>health_records</span><b>${count} 筆資料</b></div>
+    <div class="diagnostic-item"><span>最新日期</span><b>${latestDate}</b></div>
+    <div class="diagnostic-item"><span>同步狀態</span><b>${mode||"—"}</b></div>
+    <div class="diagnostic-item"><span>最後整理</span><b>${lastSyncAt?lastSyncAt.toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"}):"—"}</b></div>`;
+}
+
+document.addEventListener("click",e=>{
+  const rb=e.target.closest(".range-switch button");
+  if(rb){
+    const box=rb.closest(".range-switch");
+    box.querySelectorAll("button").forEach(b=>b.classList.toggle("active",b===rb));
+    if(box.id==="trendRange")trendRangeDays=rb.dataset.range;
+    if(box.id==="weightRange")weightRangeDays=rb.dataset.range;
+    renderAll();
+  }
+  const labToggle=e.target.closest(".lab-date-toggle");
+  if(labToggle)labToggle.closest(".lab-date-group")?.classList.toggle("open");
 });

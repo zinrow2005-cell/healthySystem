@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="健康監測">
-  <title>健康監測 V14.5</title>
+  <title>健康監測 V15.1</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -16,12 +16,13 @@
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-mark">❤</div>
-      <div><div class="brand-title">健康監測</div><div class="brand-sub">V14.5 Date + Interactive Charts</div></div>
+      <div><div class="brand-title">健康監測</div><div class="brand-sub">V15.1 Rule QA + Reference Ranges</div></div>
     </div>
     <nav>
       <button class="nav-btn active" data-page="dashboard">🏠 <span>健康總覽</span></button>
       <button class="nav-btn" data-page="weightlog">⚖️ <span>體重紀錄</span></button>
       <button class="nav-btn" data-page="trends">📈 <span>趨勢分析</span></button>
+      <button class="nav-btn secondary-nav" data-page="intelligence">🧠 <span>健康智慧</span></button>
       <button class="nav-btn secondary-nav" data-page="alerts">🚦 <span>異常提醒</span></button>
       <button class="nav-btn secondary-nav" data-page="lifestyle">🥗 <span>健康建議</span></button>
       <button class="nav-btn secondary-nav" data-page="report">🧾 <span>健康報告</span></button>
@@ -90,14 +91,23 @@
       </div>
 
       <article class="card">
-        <h2>體重趨勢</h2>
+        <div class="card-head-row">
+          <h2>體重趨勢</h2>
+          <div class="range-switch" id="weightRange">
+            <button data-range="all" class="active">全部</button>
+            <button data-range="365">1年</button>
+            <button data-range="180">6個月</button>
+            <button data-range="90">3個月</button>
+          </div>
+        </div>
         <div class="chart-wrap"><canvas id="weightLogChart"></canvas></div>
         <div id="weightTrendText"></div>
       </article>
 
       <article class="card">
         <h2>體重紀錄</h2>
-        <div class="table-wrap">
+        <div id="labGroupedList" class="lab-grouped-list"></div>
+        <div class="table-wrap lab-table-fallback">
           <table>
             <thead><tr><th>日期</th><th>體重</th><th>BMI</th><th>與前次差異</th><th>操作</th></tr></thead>
             <tbody id="weightLogBody"></tbody>
@@ -107,6 +117,20 @@
     </section>
 
     <section class="page" id="trends">
+      <article class="card compact-card">
+        <div class="card-head-row">
+          <div>
+            <h2>趨勢時間範圍</h2>
+            <p class="small">點圖表資料點可查看完整日期、數值與前次差異。</p>
+          </div>
+          <div class="range-switch" id="trendRange">
+            <button data-range="all" class="active">全部</button>
+            <button data-range="365">1年</button>
+            <button data-range="180">6個月</button>
+            <button data-range="90">3個月</button>
+          </div>
+        </div>
+      </article>
       <div class="grid two">
         <article class="card"><h2>空腹血糖</h2><div class="chart-wrap"><canvas id="trendGlucose"></canvas></div><div id="trendGlucoseText"></div></article>
         <article class="card"><h2>HbA1c</h2><div class="chart-wrap"><canvas id="trendA1c"></canvas></div><div id="trendA1cText"></div></article>
@@ -121,7 +145,91 @@
       </div>
     </section>
 
-    <section class="page" id="alerts">
+    
+    <section class="page" id="intelligence">
+      <article class="card">
+        <div class="card-head-row">
+          <div>
+            <h2>健康智慧引擎</h2>
+            <p class="small">依「最新值＋前次變化＋連續趨勢＋相關指標組合」產生分層提醒。用於健康追蹤，不取代診斷。</p>
+          </div>
+          <div id="intelligenceCoverage" class="intel-coverage"></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>目前資料的智慧判讀</h2>
+        <div id="intelligenceSummary" class="intel-summary-grid"></div>
+      </article>
+
+      <article class="card">
+        <h2>分析與建議</h2>
+        <div id="intelligenceFindings" class="intel-findings"></div>
+      </article>
+
+      <article class="card">
+        <div class="card-head-row">
+          <div>
+            <h2>未來數值情境模擬器</h2>
+            <p class="small">不會寫入正式健康紀錄。可模擬未來手動登打不同數值時，系統應如何反應。</p>
+          </div>
+          <div class="sim-presets">
+            <button type="button" data-sim-preset="glucose">血糖升高</button>
+            <button type="button" data-sim-preset="kidney">腎功能下降</button>
+            <button type="button" data-sim-preset="bp">血壓升高</button>
+            <button type="button" data-sim-preset="lipid">血脂惡化</button>
+            <button type="button" data-sim-preset="improve">整體改善</button>
+          </div>
+        </div>
+        <div class="sim-grid">
+          <label>模擬日期<input id="simDate" type="date"></label>
+          <label>空腹血糖<input id="sim_fasting_glucose" type="number" step="1" placeholder="mg/dL"></label>
+          <label>HbA1c<input id="sim_hba1c" type="number" step="0.1" placeholder="%"></label>
+          <label>Creatinine<input id="sim_creatinine" type="number" step="0.01" placeholder="mg/dL"></label>
+          <label>eGFR<input id="sim_egfr" type="number" step="0.1"></label>
+          <label>uACR<input id="sim_uacr" type="number" step="0.1" placeholder="mg/g"></label>
+          <label>尿酸<input id="sim_uric_acid" type="number" step="0.1" placeholder="mg/dL"></label>
+          <label>LDL-C<input id="sim_ldl" type="number" step="1" placeholder="mg/dL"></label>
+          <label>三酸甘油酯<input id="sim_triglycerides" type="number" step="1" placeholder="mg/dL"></label>
+          <label>ALT<input id="sim_alt" type="number" step="1" placeholder="U/L"></label>
+          <label>AST<input id="sim_ast" type="number" step="1" placeholder="U/L"></label>
+          <label>收縮壓<input id="sim_systolic_bp" type="number" step="1" placeholder="mmHg"></label>
+          <label>舒張壓<input id="sim_diastolic_bp" type="number" step="1" placeholder="mmHg"></label>
+          <label>體重<input id="sim_weight" type="number" step="0.1" placeholder="kg"></label>
+        </div>
+        <div class="form-actions">
+          <button id="fillLatestBtn" type="button" class="secondary-btn">帶入目前最新值</button>
+          <button id="runSimulationBtn" type="button" class="primary-btn">執行情境模擬</button>
+        </div>
+        <div id="simulationResult" class="simulation-result"></div>
+      </article>
+
+      
+      <article class="card">
+        <h2>檢驗參考範圍資料庫</h2>
+        <p class="small">CBC、電解質、凝血等項目會優先使用檢驗單參考範圍。以下為系統通用預設，只作篩檢提示。</p>
+        <div id="referenceRangeTable" class="reference-range-grid"></div>
+      </article>
+
+      <article class="card">
+        <h2>規則庫情境測試</h2>
+        <div id="scenarioTestStatus"></div>
+        <p class="small">測試目的：避免未來新增規則時，把明顯較嚴重的情境錯判成較低層級；不是臨床驗證。</p>
+      </article>
+
+      <article class="card">
+        <h2>判讀原則</h2>
+        <div class="advice-list">
+          <div class="advice-item">單次異常不直接下診斷；需要時提示複查或由醫療人員確認。</div>
+          <div class="advice-item">同一數值會依前次數值、連續方向、其他相關指標而產生不同建議。</div>
+          <div class="advice-item">不自動建議停藥、換藥或改變處方劑量。</div>
+          <div class="advice-item">肝功能等受實驗室參考範圍影響的項目，以檢驗單範圍優先。</div>
+          <div class="advice-item">嚴重血壓或明顯急性危險訊號會升級就醫提醒。</div>
+        </div>
+      </article>
+    </section>
+
+<section class="page" id="alerts">
       <article class="card">
         <h2>紅黃綠燈健康提醒</h2>
         <div id="alertCards" class="alert-grid"></div>
@@ -188,6 +296,11 @@
             <div id="reportPlan" class="advice-list"></div>
           </article>
         </div>
+
+        <article class="card">
+          <h2>資料完整度</h2>
+          <div id="dataCompleteness" class="completeness-grid"></div>
+        </article>
 
         <article class="card">
           <h2>最近一次檢驗總表</h2>
@@ -302,6 +415,7 @@
       <article class="card">
         <h2>更多功能</h2>
         <div class="more-grid">
+          <button class="more-card" data-open-page="intelligence">🧠<span>健康智慧</span></button>
           <button class="more-card" data-open-page="alerts">🚦<span>異常提醒</span></button>
           <button class="more-card" data-open-page="lifestyle">🥗<span>健康建議</span></button>
           <button class="more-card" data-open-page="report">🧾<span>健康報告</span></button>
@@ -321,6 +435,7 @@
           <button id="testApiBtn" class="secondary-btn">測試連線</button>
         </div>
         <p id="apiMsg" class="small"></p>
+          <div id="syncDiagnostics" class="diagnostic-grid"></div>
       </article>
       <article class="card">
         <h2>目前個人基準</h2>
@@ -332,5 +447,6 @@
   </main>
 </div>
 <script src="app.js"></script>
+<script src="health_intelligence.js"></script>
 </body>
 </html>

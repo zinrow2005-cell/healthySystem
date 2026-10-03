@@ -220,3 +220,79 @@ th{background:#f1f6f5}
 /* V14.5 interactive charts */
 .chart-wrap canvas{cursor:crosshair;touch-action:pan-y}
 @media (max-width:700px){.chart-wrap canvas{cursor:default}}
+
+/* ===== V14.6 Long-Term Health UX ===== */
+.card-head-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.compact-card{padding-top:14px;padding-bottom:14px}
+.range-switch{display:flex;gap:6px;flex-wrap:wrap}
+.range-switch button{border:1px solid #dbe3e5;background:#fff;color:#5f6b70;border-radius:999px;padding:7px 11px;font-size:12px;cursor:pointer}
+.range-switch button.active{background:#0f766e;color:#fff;border-color:#0f766e}
+.chart-note{margin-top:8px;font-size:12px;color:#6b7478}
+.diagnostic-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.diagnostic-item{background:#f7faf9;border:1px solid #e0e8e6;border-radius:12px;padding:12px}
+.diagnostic-item span{display:block;font-size:11px;color:#6b7478}
+.diagnostic-item b{display:block;font-size:16px;margin-top:4px;word-break:break-word}
+.diagnostic-item.warn{background:#fff8eb;border-color:#f3d6a3}
+.completeness-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.completeness-item{border:1px solid #e2e8ea;border-radius:12px;padding:12px}
+.completeness-item b{display:block;font-size:15px}
+.completeness-item span{display:block;color:#6b7478;font-size:12px;margin-top:4px}
+.lab-grouped-list{display:grid;gap:10px}
+.lab-date-group{border:1px solid #e1e7e9;border-radius:14px;overflow:hidden;background:#fff}
+.lab-date-toggle{width:100%;border:0;background:#f8faf9;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;text-align:left}
+.lab-date-toggle b{font-size:15px}
+.lab-date-toggle span{font-size:12px;color:#6b7478}
+.lab-date-body{display:none;padding:0 14px 12px}
+.lab-date-group.open .lab-date-body{display:block}
+.lab-mini-row{display:grid;grid-template-columns:1.5fr 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid #edf1f2;align-items:center}
+.lab-mini-row:last-child{border-bottom:0}
+.lab-mini-row strong{text-align:right}
+.lab-table-fallback{display:none}
+@media(max-width:900px){
+  .diagnostic-grid,.completeness-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:700px){
+  .range-switch{width:100%;display:grid;grid-template-columns:repeat(4,1fr)}
+  .range-switch button{width:100%;padding:8px 4px}
+  .diagnostic-grid,.completeness-grid{grid-template-columns:1fr 1fr}
+  .lab-mini-row{grid-template-columns:1fr auto}
+  .lab-mini-row span{grid-column:1/-1}
+}
+
+/* ===== V15.0 Health Intelligence Engine ===== */
+.intel-coverage{display:grid;grid-template-columns:repeat(4,minmax(80px,1fr));gap:8px}
+.intel-coverage>div{background:#f7faf9;border:1px solid #e3e9e8;border-radius:12px;padding:9px;text-align:center}
+.intel-coverage b{display:block;font-size:18px}.intel-coverage span{display:block;font-size:10px;color:#6b7478;margin-top:2px}
+.intel-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.intel-summary-card{border:1px solid #e3e9ea;border-radius:14px;padding:13px}
+.intel-summary-card span,.intel-summary-card small{display:block}.intel-summary-card b{display:block;font-size:17px;margin:5px 0}
+.intel-findings{display:grid;gap:10px}
+.intel-finding{border:1px solid #e0e7e8;border-left-width:5px;border-radius:12px;padding:13px}
+.intel-finding-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.intel-finding-head span{font-size:11px;font-weight:800;border-radius:999px;padding:4px 8px;background:#eef2f3}
+.intel-finding p{margin:8px 0 5px}.intel-detail{font-weight:700;margin-top:6px}.intel-finding small{color:#6b7478}
+.intel-stable{border-color:#b9ded2!important}.intel-watch{border-color:#f3d49a!important}.intel-priority{border-color:#efb5a9!important}.intel-urgent{border-color:#d86b6b!important;background:#fff5f5!important}
+.sim-presets{display:flex;gap:6px;flex-wrap:wrap}.sim-presets button{border:1px solid #dce5e6;background:#fff;border-radius:999px;padding:7px 10px;cursor:pointer}
+.sim-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+.sim-grid label{font-size:12px;font-weight:700}.sim-grid input{width:100%;min-height:42px;margin-top:5px;border:1px solid #d9e2e4;border-radius:10px;padding:8px 10px;font-size:15px}
+.simulation-result{margin-top:14px;display:grid;gap:8px}.sim-level{border-radius:12px;padding:12px;font-weight:800}.sim-finding{border-left:4px solid #d7dfe0;padding:10px 12px;background:#fafcfc;border-radius:9px}.sim-finding p{margin:5px 0}
+.test-pass{display:flex;gap:12px;align-items:center;border:1px solid #cfe6dd;background:#f5fbf8;border-radius:12px;padding:12px}.test-pass b{font-size:22px}.test-pass span{font-size:13px}
+#scenarioTestStatus details{margin-top:10px}#scenarioTestStatus pre{overflow:auto;background:#f7f8f8;border-radius:10px;padding:10px;font-size:11px}
+@media(max-width:1000px){.intel-summary-grid{grid-template-columns:1fr 1fr}.sim-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.intel-coverage{grid-template-columns:1fr 1fr}.intel-summary-grid{grid-template-columns:1fr}.sim-grid{grid-template-columns:1fr 1fr}.sim-presets{display:grid;grid-template-columns:1fr 1fr}.sim-presets button{width:100%}}
+@media(max-width:390px){.sim-grid{grid-template-columns:1fr}}
+
+/* ===== V15.1 Rule QA + Reference Ranges ===== */
+.intel-confidence{display:inline-block;margin-top:8px;font-style:normal;font-size:10px;border-radius:999px;padding:3px 7px;background:#f2f4f5;color:#536067}
+.intel-confidence.high{background:#e9f6ef;color:#176b48}
+.intel-confidence.medium{background:#fff6df;color:#8a5a00}
+.intel-confidence.low{background:#f2f4f5;color:#66727a}
+.intel-why{margin-top:8px;border-top:1px dashed #dce4e5;padding-top:7px}
+.intel-why summary{font-size:11px;color:#536067;cursor:pointer}
+.intel-why p{font-size:12px;color:#66727a;margin:6px 0 0}
+.reference-range-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.reference-range-item{border:1px solid #e1e7e8;border-radius:12px;padding:11px}
+.reference-range-item b,.reference-range-item span,.reference-range-item small{display:block}
+.reference-range-item span{font-size:13px;margin:4px 0}.reference-range-item small{font-size:10px;color:#6b7478}
+@media(max-width:900px){.reference-range-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:390px){.reference-range-grid{grid-template-columns:1fr}}

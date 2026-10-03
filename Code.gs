@@ -2,8 +2,9 @@ const LAB_SHEET='health_records';
 
 function doGet(e){
   const action=(e&&e.parameter&&e.parameter.action)||'list';
-  if(action==='ping') return json_({ok:true,version:'V14.5'});
+  if(action==='ping') return json_({ok:true,version:'V15.1'});
   if(action==='list') return list_();
+  if(action==='diagnostics') return diagnostics_();
   return json_({ok:false,error:'unknown action'});
 }
 function doPost(e){
@@ -74,4 +75,14 @@ function deleteWeight_(date){
     }
   }
   return json_({ok:true});
+}
+
+function diagnostics_(){
+  const sh=sheet_(),values=sh.getDataRange().getValues();
+  let latest='';
+  if(values.length>1){
+    const d=values[values.length-1][0];
+    latest=d instanceof Date?Utilities.formatDate(d,'Asia/Taipei','yyyy-MM-dd'):String(d||'');
+  }
+  return json_({ok:true,version:'V15.1',sheet:LAB_SHEET,records:Math.max(0,values.length-1),latest_date:latest});
 }
