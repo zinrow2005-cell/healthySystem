@@ -433,14 +433,46 @@ async function apiGet(action){
   const api=localStorage.getItem("healthApiUrl")||"";
   if(!api) throw new Error("尚未設定 Apps Script URL");
   const u=new URL(api);u.searchParams.set("action",action);
-  const r=await fetch(u.toString(),{cache:"no-store"}),d=await r.json();
-  if(!d.ok) throw new Error(d.error||"API error"); return d;
+  let r;
+  try{
+    r=await fetch(u.toString(),{
+      method:"GET",
+      mode:"cors",
+      credentials:"omit",
+      redirect:"follow",
+      cache:"no-store"
+    });
+  }catch(err){
+    throw new Error("Apps Script 網路請求失敗："+(err?.message||err));
+  }
+  if(!r.ok) throw new Error(`Apps Script HTTP ${r.status}`);
+  let d;
+  try{d=await r.json()}catch(e){throw new Error("Apps Script 回傳內容不是有效 JSON")}
+  if(!d.ok) throw new Error(d.error||"API error");
+  return d;
 }
 async function apiPost(payload){
   const api=localStorage.getItem("healthApiUrl")||"";
   if(!api) throw new Error("尚未設定 Apps Script URL");
-  const r=await fetch(api,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
-  const d=await r.json();if(!d.ok) throw new Error(d.error||"API error");return d;
+  let r;
+  try{
+    r=await fetch(api,{
+      method:"POST",
+      mode:"cors",
+      credentials:"omit",
+      redirect:"follow",
+      cache:"no-store",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    });
+  }catch(err){
+    throw new Error("Apps Script 網路請求失敗："+(err?.message||err));
+  }
+  if(!r.ok) throw new Error(`Apps Script HTTP ${r.status}`);
+  let d;
+  try{d=await r.json()}catch(e){throw new Error("Apps Script 回傳內容不是有效 JSON")}
+  if(!d.ok) throw new Error(d.error||"API error");
+  return d;
 }
 
 async function loadData(){
@@ -520,7 +552,10 @@ $("#saveApiBtn").addEventListener("click",()=>{localStorage.setItem("healthApiUr
 $("#testApiBtn").addEventListener("click",async()=>{
   const u=$("#apiUrl").value.trim();if(!u){$("#apiMsg").textContent="請先貼上 /exec 網址。";return}
   try{localStorage.setItem("healthApiUrl",u);const d=await apiGet("ping");const list=await apiGet("list"); $("#apiMsg").textContent=`連線成功：${d.version||""}・health_records ${Array.isArray(list.records)?list.records.length:0} 筆`}
-  catch(e){$("#apiMsg").textContent="連線失敗："+e.message}
+  catch(e){
+    const msg=String(e.message||e);
+    $("#apiMsg").innerHTML=`連線失敗：${msg}<br><small>手機若仍失敗，請確認 Apps Script Web App 已重新部署，且「誰可以存取」不是只限電腦目前登入的帳號。</small>`;
+  }
 });
 $("#printReportBtn").addEventListener("click",()=>window.print());
 $("#copyReportBtn").addEventListener("click",async()=>{

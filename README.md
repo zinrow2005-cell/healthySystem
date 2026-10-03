@@ -53,3 +53,17 @@ V16.2.2 App Icon Integrated
 
 上傳到 GitHub 後，手機加入主畫面時會使用新的 APP 圖示。
 如果手機仍顯示舊圖示，請重新整理一次並重新加入主畫面，讓 PWA 快取更新。
+
+## V16.2.3 手機 Apps Script 連線修正
+本版修正 iPhone / iPad PWA 可能出現：
+`FetchEvent.respondWith received an error: Returned response is null`
+
+原因是舊版 Service Worker 會攔截跨網域的 Google Apps Script 請求。
+現在 Service Worker 只處理 GitHub Pages 自己網域的檔案，
+Google Apps Script 請求會直接交給瀏覽器，不再經過 PWA 快取 fallback。
+
+上傳 GitHub 後：
+1. 等 GitHub Pages 更新。
+2. iPhone/iPad 先關閉 APP。
+3. 若仍是舊版，刪除主畫面 APP 後重新加入。
+4. 重新進入「資料連線」測試 Apps Script。
