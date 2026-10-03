@@ -40,4 +40,16 @@ GitHub Repository → Settings → Pages：
 - JSON / CSV 備份
 
 ## 版本
-V16.2 Production Readiness
+V16.2.2 App Icon Integrated
+
+
+## APP 小圖示
+這版已經整合新的 APP 圖示：
+- `icon-192.png`
+- `icon-512.png`
+- `apple-touch-icon.png`
+- `favicon-32.png`
+- `favicon-16.png`
+
+上傳到 GitHub 後，手機加入主畫面時會使用新的 APP 圖示。
+如果手機仍顯示舊圖示，請重新整理一次並重新加入主畫面，讓 PWA 快取更新。

@@ -1,0 +1,12 @@
+{
+  "health_intelligence.js": true,
+  "app.js": true,
+  "multi_marker_engine.js": true,
+  "sw.js": true,
+  "auto_init_present": true,
+  "simulation_button_present": true,
+  "fill_latest_button_present": true,
+  "preset_buttons_present": true,
+  "bind_present": true,
+  "cache_bumped": true
+}

@@ -1,0 +1,12 @@
+{
+  "manifest_has_icons": true,
+  "html_apple_touch_icon": true,
+  "html_favicon_32": true,
+  "html_favicon_16": true,
+  "sw_cache_bumped": true,
+  "icon_files_exist": true,
+  "app.js_syntax": true,
+  "health_intelligence.js_syntax": true,
+  "multi_marker_engine.js_syntax": true,
+  "sw.js_syntax": true
+}

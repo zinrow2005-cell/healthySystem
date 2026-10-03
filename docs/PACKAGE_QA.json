@@ -1,0 +1,14 @@
+{
+  "index_exists": true,
+  "app_exists": true,
+  "apps_script_exists": true,
+  "manifest_exists": true,
+  "service_worker_exists": true,
+  "pattern_engine_exists": true,
+  "lab_catalog_exists": true,
+  "no_old_qa_in_root": true,
+  "app.js_syntax": true,
+  "health_intelligence.js_syntax": true,
+  "multi_marker_engine.js_syntax": true,
+  "sw.js_syntax": true
+}

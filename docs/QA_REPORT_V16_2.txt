@@ -1,0 +1,14 @@
+{
+  "version_v162": true,
+  "required_ui": true,
+  "single_id_uniqueness": true,
+  "backup_logic": true,
+  "duplicate_check_logic": true,
+  "online_offline_logic": true,
+  "apps_script_actions": true,
+  "sw_network_first": true,
+  "app.js_syntax": true,
+  "health_intelligence.js_syntax": true,
+  "multi_marker_engine.js_syntax": true,
+  "sw.js_syntax": true
+}
