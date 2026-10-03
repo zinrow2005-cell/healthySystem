@@ -285,21 +285,32 @@
     return r;
   }
   function runSimulation(){
-    const r=simulatorRecord();
-    const base=sortRows(records||[]);
-    const merged=[...base,r];
-    const result=analyze(merged,{simulation:true});
     const box=document.querySelector("#simulationResult");
     if(!box)return;
-    box.innerHTML=`<div class="sim-level ${LEVEL_CLASS[result.level]}">模擬結果：${LEVEL_LABEL[result.level]}</div>`+
-      result.findings.slice(0,10).map(f=>`<div class="sim-finding ${LEVEL_CLASS[f.level]}"><b>${f.title}</b><p>${f.message}</p>${f.detail?`<small>${f.detail}</small>`:""}</div>`).join("");
+    try{
+      const r=simulatorRecord();
+      const entered=Object.keys(r).filter(k=>k!=="date");
+      if(!entered.length){
+        box.innerHTML=`<div class="sim-level level-watch">請先輸入至少一個模擬數值，或使用上方快速情境按鈕。</div>`;
+        return;
+      }
+      const base=sortRows(typeof records!=="undefined"?(records||[]):[]);
+      const merged=[...base,r];
+      const result=analyze(merged,{simulation:true});
+      const items=result.findings.slice(0,10).map(f=>`<div class="sim-finding ${LEVEL_CLASS[f.level]}"><b>${f.title}</b><p>${f.message}</p>${f.detail?`<small>${f.detail}</small>`:""}</div>`).join("");
+      box.innerHTML=`<div class="sim-level ${LEVEL_CLASS[result.level]}">模擬結果：${LEVEL_LABEL[result.level]}</div>`+
+        (items||`<div class="sim-finding level-stable"><b>目前沒有觸發既有異常規則</b><p>這代表這組模擬值目前沒有形成系統已建立的提醒，不等同完整醫療判定。</p></div>`);
+      box.scrollIntoView({behavior:"smooth",block:"nearest"});
+    }catch(e){
+      box.innerHTML=`<div class="sim-level level-priority">模擬器執行失敗</div><div class="sim-finding level-priority"><b>程式錯誤</b><p>${String(e.message||e)}</p></div>`;
+    }
   }
   function fillLatest(){
     const fields=["fasting_glucose","hba1c","creatinine","egfr","uacr","uric_acid","ldl","triglycerides","alt","ast","systolic_bp","diastolic_bp","weight"];
-    fields.forEach(f=>{const r=latestRowWith(records||[],f),el=document.querySelector("#sim_"+f);if(el)el.value=r?num(r[f]):""});
+    fields.forEach(f=>{const r=latestRowWith(typeof records!=="undefined"?(records||[]):[],f),el=document.querySelector("#sim_"+f);if(el)el.value=r?num(r[f]):""});
     const d=document.querySelector("#simDate");
     if(d){
-      const s=sortRows(records||[]);const last=s.length?new Date(key(s.at(-1).date)+"T00:00:00+08:00"):new Date();
+      const s=sortRows(typeof records!=="undefined"?(records||[]):[]);const last=s.length?new Date(key(s.at(-1).date)+"T00:00:00+08:00"):new Date();
       last.setDate(last.getDate()+90);d.value=last.toISOString().slice(0,10);
     }
   }
@@ -389,4 +400,16 @@
   }
 
   window.HealthIntel={init,analyze,render,runTests,fillLatest,runSimulation,getDB:()=>DB,adaptiveAdvice,renderAdaptiveLifestyle};
+
+  let initialized=false;
+  async function autoInit(){
+    if(initialized)return;
+    initialized=true;
+    await init();
+  }
+  if(document.readyState==="loading"){
+    window.addEventListener("DOMContentLoaded",autoInit,{once:true});
+  }else{
+    autoInit();
+  }
 })();
